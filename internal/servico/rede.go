@@ -20,6 +20,7 @@ import (
 	"net"
 	"net/http"
 	"net/http/httptest"
+	"net/netip"
 	"net/url"
 	"os"
 	"os/exec"
@@ -445,6 +446,26 @@ func (s *Servico) redePushToken(w http.ResponseWriter, r *http.Request) {
 	escreverJSON(w, map[string]bool{"ok": true})
 }
 
+// origemLocalPareamento garante que o pareamento só acontece a partir da rede local (IP
+// privado ou loopback) e nunca através de um proxy/túnel (cabeçalhos de encaminhamento).
+func origemLocalPareamento(r *http.Request) bool {
+	for _, cab := range []string{"Cf-Connecting-Ip", "X-Forwarded-For", "Forwarded", "X-Real-Ip"} {
+		if r.Header.Get(cab) != "" {
+			return false
+		}
+	}
+	host, _, err := net.SplitHostPort(strings.TrimSpace(r.RemoteAddr))
+	if err != nil {
+		host = strings.TrimSpace(r.RemoteAddr)
+	}
+	addr, err := netip.ParseAddr(host)
+	if err != nil {
+		return false
+	}
+	addr = addr.Unmap()
+	return addr.IsLoopback() || addr.IsPrivate()
+}
+
 func (s *Servico) redeParear(w http.ResponseWriter, r *http.Request) {
 	var pedido struct {
 		Codigo    string `json:"code"`
@@ -458,7 +479,7 @@ func (s *Servico) redeParear(w http.ResponseWriter, r *http.Request) {
 	}
 	// O pareamento só se faz na rede local: pelo túnel (aberto à internet) só passam aparelhos
 	// que já têm token.
-	if r.Header.Get("Cf-Connecting-Ip") != "" {
+	if !origemLocalPareamento(r) {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusForbidden)
 		json.NewEncoder(w).Encode(map[string]string{"error": "pareie na mesma rede Wi-Fi do computador"})

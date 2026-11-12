@@ -23,6 +23,7 @@ func (a *ambiente) rede(metodo, caminho, token string, corpo any) (int, map[stri
 		json.NewEncoder(&b).Encode(corpo)
 	}
 	req := httptest.NewRequest(metodo, caminho, &b)
+	req.RemoteAddr = "127.0.0.1:12345"
 	if token != "" {
 		req.Header.Set("Authorization", "Bearer "+token)
 	}
@@ -126,20 +127,43 @@ func TestQRNoTerminal(t *testing.T) {
 	}
 }
 
-// Pelo túnel (aberto à internet), um código válido não chega para parear.
+// Pelo túnel ou fora da rede local, um código válido não chega para parear.
 func TestPareamentoRecusadoPeloTunel(t *testing.T) {
 	a := novoAmbiente(t, nil)
 	codigo, _ := a.srv.aparelhos.novoCodigo(time.Now())
 	b, _ := json.Marshal(map[string]string{"code": codigo, "device": "intruso"})
-	req := httptest.NewRequest("POST", "/v1/pair", bytes.NewReader(b))
-	req.Header.Set("Cf-Connecting-Ip", "203.0.113.7")
-	rec := httptest.NewRecorder()
-	a.srv.rotasRede().ServeHTTP(rec, req)
-	if rec.Code != http.StatusForbidden {
-		t.Fatalf("pareamento pelo túnel devia dar 403, deu %d", rec.Code)
+
+	casos := []struct {
+		nome   string
+		remote string
+		header [2]string
+	}{
+		{"cf", "127.0.0.1:1234", [2]string{"Cf-Connecting-Ip", "203.0.113.7"}},
+		{"xff", "192.168.1.5:1234", [2]string{"X-Forwarded-For", "192.168.1.5"}},
+		{"forwarded", "192.168.1.5:1234", [2]string{"Forwarded", "for=203.0.113.7"}},
+		{"x-real-ip", "192.168.1.5:1234", [2]string{"X-Real-Ip", "203.0.113.7"}},
+		{"ip-publico", "203.0.113.7:1234", [2]string{}},
 	}
-	if c, _ := a.rede("POST", "/v1/pair", "", map[string]string{"code": codigo, "device": "iPhone"}); c != 200 {
-		t.Fatalf("o código continua válido na rede local, deu %d", c)
+	for _, tc := range casos {
+		req := httptest.NewRequest("POST", "/v1/pair", bytes.NewReader(b))
+		req.RemoteAddr = tc.remote
+		if tc.header[0] != "" {
+			req.Header.Set(tc.header[0], tc.header[1])
+		}
+		rec := httptest.NewRecorder()
+		a.srv.rotasRede().ServeHTTP(rec, req)
+		if rec.Code != http.StatusForbidden {
+			t.Fatalf("%s: pareamento fora da rede local devia dar 403, deu %d", tc.nome, rec.Code)
+		}
+	}
+
+	// IP privado na rede local (incluindo IPv4 mapeado em IPv6) continua a parear.
+	reqLocal := httptest.NewRequest("POST", "/v1/pair", bytes.NewReader(b))
+	reqLocal.RemoteAddr = "[::ffff:192.168.1.25]:55555"
+	recLocal := httptest.NewRecorder()
+	a.srv.rotasRede().ServeHTTP(recLocal, reqLocal)
+	if recLocal.Code != 200 {
+		t.Fatalf("o código continua válido na rede local, deu %d (%s)", recLocal.Code, recLocal.Body.String())
 	}
 }
 
