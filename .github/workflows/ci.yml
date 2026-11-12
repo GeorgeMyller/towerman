@@ -21,7 +21,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        include: ${{ fromJSON('[{"sistema":"linux","runner":"ubuntu-latest"},{"sistema":"macos","runner":"macos-latest"},{"sistema":"windows","runner":"windows-latest"}]') }}
+        include: [{"sistema":"linux","runner":"ubuntu-latest"},{"sistema":"macos","runner":"macos-latest"},{"sistema":"windows","runner":"windows-latest"}]
     runs-on: ${{ matrix.runner }}
     steps:
       - uses: actions/checkout@v4
@@ -46,7 +46,7 @@ jobs:
   # Compila para o Windows e para as 6 plataformas da release num só job: o checkout e o Go
   # instalam-se uma vez, e a cache de compilação passa de um alvo para o seguinte.
   compilar:
-    runs-on: ${{ fromJSON('"ubuntu-latest"') }}
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-go@v5

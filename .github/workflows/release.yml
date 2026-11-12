@@ -22,7 +22,7 @@ permissions:
 jobs:
   # As 6 plataformas num só job no Mac mini: no Pi eram 6 jobs em série, cerca de 20 min.
   binarios:
-    runs-on: ${{ fromJSON('"ubuntu-latest"') }}
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
@@ -45,7 +45,7 @@ jobs:
           path: dist/*
 
   dmg:
-    runs-on: ${{ fromJSON('"macos-latest"') }}
+    runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
         with:
@@ -95,7 +95,7 @@ jobs:
 
   publicar:
     needs: [binarios, dmg]
-    runs-on: ${{ fromJSON('"ubuntu-latest"') }}
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/download-artifact@v4
