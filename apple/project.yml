@@ -16,7 +16,7 @@ settings:
     CODE_SIGN_STYLE: Automatic
     # A versão é a do servidor (internal/config/config.go), sem o sufixo -rc. O número de build cresce a cada commit
     # (script «Número de build»): com o mesmo número, o iOS guarda o ícone velho nas notificações.
-    MARKETING_VERSION: "2.0.0"
+    MARKETING_VERSION: "2.0.1"
     CURRENT_PROJECT_VERSION: "1"
     ENABLE_USER_SCRIPT_SANDBOXING: NO
 targets:

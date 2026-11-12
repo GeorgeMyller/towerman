@@ -16,7 +16,7 @@ import (
 const (
 	PortaPadrao        = 7777
 	TimeoutHookPadrao  = 5 * time.Millisecond
-	Versao             = "2.0.0"
+	Versao             = "2.0.1"
 	tamanhoTokenBytes  = 32
 	permissaoFicheiros = 0o600
 )
