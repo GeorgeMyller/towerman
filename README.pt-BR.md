@@ -1,6 +1,6 @@
 # Towerman
 
-[English](README.md)
+**[Download e documentação →](https://georgemyller.github.io/towerman/)** · [English](README.md)
 
 O radar dos seus agentes de código (Claude Code, Codex, Antigravity `agy` e o agente do Antigravity IDE) em todos os seus computadores, numa só tela. Aprove ou negue pedidos, escolha a resposta de uma pergunta, mande texto ao agente e traga o terminal para a frente, pelo iPhone, pelo pulso ou pela barra de menus do Mac.
 

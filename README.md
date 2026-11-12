@@ -1,6 +1,6 @@
 # Towerman
 
-[Português (Brasil)](README.pt-BR.md)
+**[Download and docs →](https://georgemyller.github.io/towerman/)** · [Português (Brasil)](README.pt-BR.md)
 
 A radar for your coding agents (Claude Code, Codex, Antigravity `agy` and the Antigravity IDE agent) across all your computers, on one screen. Approve or deny requests, pick an answer to a question, send text to an agent and bring its terminal to the front, from your iPhone, your wrist or the Mac menu bar.
 
