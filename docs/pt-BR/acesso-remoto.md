@@ -31,7 +31,7 @@ O relay (`cmd/towerman-relay`) repassa envelopes cifrados de ponta a ponta entre
    openssl rand -hex 32
    ```
 2. Publique o relay com HTTPS. O iOS recusa HTTP simples para um endereço público.
-   - **Render:** faça um fork do repositório e crie um Blueprint a partir do `render.yaml`. Defina `TOWERMAN_RELAY_TOKENS` no painel. O plano gratuito funciona. Ele dorme sem uso e acorda quando um computador se conecta.
+   - **Render:** use o botão de um clique em [GeorgeMyller/towerman-relay](https://github.com/GeorgeMyller/towerman-relay), ou faça um fork dele e crie um Blueprint a partir do `render.yaml`. (O `render.yaml` deste repositório também serve.) Defina `TOWERMAN_RELAY_TOKENS` no painel. O plano gratuito funciona. Ele dorme sem uso e acorda quando um computador se conecta.
    - **Docker numa VPS:**
      ```sh
      docker build -f Dockerfile.relay -t towerman-relay .
