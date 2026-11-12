@@ -1,0 +1,70 @@
+name: ci
+
+# Repo privado: tudo corre no Mac mini (M4). Os testes Linux correm lá num contentor golang
+# (Linux arm64, ~1 min); no Raspberry Pi demoravam 9 min, por isso o Pi fica de reserva. O Windows
+# não tem runner: compila-se para ele (vet e testes compilados, sem os correr). Repo público:
+# corre nos runners do GitHub, que lá são gratuitos.
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+# Um push novo num PR cancela a execução anterior, que já não interessa.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  testes:
+    name: testes (${{ matrix.sistema }})
+    strategy:
+      fail-fast: false
+      matrix:
+        include: ${{ fromJSON('[{"sistema":"linux","runner":"ubuntu-latest"},{"sistema":"macos","runner":"macos-latest"},{"sistema":"windows","runner":"windows-latest"}]') }}
+    runs-on: ${{ matrix.runner }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        if: matrix.sistema != 'linux' || runner.os == 'Linux'
+        with:
+          go-version-file: go.mod
+      - name: testes no runner
+        if: matrix.sistema != 'linux' || runner.os == 'Linux'
+        shell: bash
+        run: .github/testes.sh
+      - name: testes Linux num contentor
+        # As caches do Go ficam em volumes do Docker, para a execução seguinte não recompilar tudo.
+        if: matrix.sistema == 'linux' && runner.os == 'macOS'
+        run: |
+          docker info >/dev/null 2>&1 || { echo "::error::o Docker não está a correr no Mac mini"; exit 1; }
+          versao=$(sed -n 's/^go \([0-9.]*\).*/\1/p' go.mod)
+          docker run --rm -v "$PWD":/src -w /src \
+            -v towerman-go-build:/root/.cache/go-build -v towerman-go-mod:/go/pkg/mod \
+            "golang:$versao" .github/testes.sh
+
+  # Compila para o Windows e para as 6 plataformas da release num só job: o checkout e o Go
+  # instalam-se uma vez, e a cache de compilação passa de um alvo para o seguinte.
+  compilar:
+    runs-on: ${{ fromJSON('"ubuntu-latest"') }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - name: vet e testes compilados para o Windows
+        env:
+          GOOS: windows
+          CGO_ENABLED: "0"
+        run: |
+          go vet ./...
+          go test -c -o "$RUNNER_TEMP/windows/" ./...
+      - name: binários de todas as plataformas
+        env:
+          CGO_ENABLED: "0"
+        run: |
+          for alvo in linux/amd64 linux/arm64 darwin/amd64 darwin/arm64 windows/amd64 windows/arm64; do
+            echo "::group::$alvo"
+            GOOS=${alvo%/*} GOARCH=${alvo#*/} go build -trimpath -o "dist/towerman-${alvo%/*}-${alvo#*/}" ./cmd/towerman
+            echo "::endgroup::"
+          done

@@ -1,0 +1,30 @@
+// Towerman: equipa e identificadores da Apple usados por todos os alvos.
+//
+// Estes são padrões neutros: não compilam para um aparelho até haver uma equipa.
+// Não edite este ficheiro para assinar com a sua conta. Copie Local.xcconfig.example
+// para Local.xcconfig (ignorado pelo git) e preencha lá os seus valores.
+
+// Team ID da sua conta Apple (10 caracteres). Vazio: o Xcode pede a equipa ao assinar.
+TOWERMAN_TEAM_ID =
+
+// Prefixo em notação DNS invertida de onde saem os IDs abaixo.
+TOWERMAN_ID_PREFIX = com.example
+
+// App do iPhone. O relógio, os widgets e as extensões derivam deste ID:
+// .watchkitapp, .watchkitapp.widgets, .live e .notifications.
+TOWERMAN_IOS_BUNDLE_ID = $(TOWERMAN_ID_PREFIX).towerman
+
+// App do Mac.
+TOWERMAN_MAC_BUNDLE_ID = $(TOWERMAN_ID_PREFIX).towerman.mac
+
+// App Group partilhado pelo app do relógio e pelos widgets.
+TOWERMAN_APP_GROUP = group.$(TOWERMAN_ID_PREFIX).towerman
+
+// Base do grupo de Keychain (.shared), dos serviços do Keychain (.token, .e2ee, .e2ee.server)
+// e do nome do esquema de URL de pareamento (.pair).
+TOWERMAN_SHARED_ID = $(TOWERMAN_ID_PREFIX).towerman
+
+DEVELOPMENT_TEAM = $(TOWERMAN_TEAM_ID)
+
+// Valores locais de quem compila (opcional; não vai para o git).
+#include? "Local.xcconfig"

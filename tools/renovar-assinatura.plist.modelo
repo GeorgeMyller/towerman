@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Modelo do LaunchAgent da renovação semanal da assinatura (conta Apple gratuita).
+  Não edite à mão: «tools/renovar-assinatura.sh instalar» preenche os marcadores @...@
+  e grava o resultado em ~/Library/LaunchAgents/@ROTULO@.plist.
+  Corre a cada 6 horas e ao iniciar a sessão. O registo fica em @LOG_DIR@/renew.log.
+-->
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>@ROTULO@</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>/bin/bash</string>
+    <string>@SCRIPT@</string>
+  </array>
+  <key>StartInterval</key>
+  <integer>21600</integer>
+  <key>RunAtLoad</key>
+  <true/>
+  <key>StandardOutPath</key>
+  <string>/dev/null</string>
+  <key>StandardErrorPath</key>
+  <string>@LOG_DIR@/renew.stderr.log</string>
+</dict>
+</plist>

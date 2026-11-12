@@ -1,0 +1,27 @@
+// Copie este ficheiro para Config/Local.xcconfig e preencha os seus valores.
+// O Local.xcconfig está no .gitignore: fica só na sua máquina.
+// Qualquer variável que não definir aqui usa o padrão de Config/Towerman.xcconfig.
+
+// Team ID da sua conta Apple (10 caracteres). Veja-o no Xcode, em Settings > Accounts,
+// ou em developer.apple.com > Membership. Uma conta Apple gratuita também tem um.
+TOWERMAN_TEAM_ID = ABCDE12345
+
+// Prefixo único seu, em notação DNS invertida (ex.: io.github.seu-utilizador).
+// Os bundle IDs têm de ser únicos entre todas as contas Apple: não use com.example.
+TOWERMAN_ID_PREFIX = io.github.seu-utilizador
+
+// As linhas abaixo são opcionais. Os padrões derivam do prefixo:
+//
+// Bundle ID do app do iPhone. O relógio usa <este>.watchkitapp, os widgets do relógio
+// <este>.watchkitapp.widgets, a Live Activity <este>.live e as notificações <este>.notifications.
+// TOWERMAN_IOS_BUNDLE_ID = $(TOWERMAN_ID_PREFIX).towerman
+//
+// Bundle ID do app do Mac.
+// TOWERMAN_MAC_BUNDLE_ID = $(TOWERMAN_ID_PREFIX).towerman.mac
+//
+// App Group do relógio e dos widgets (tem de começar por "group.").
+// TOWERMAN_APP_GROUP = group.$(TOWERMAN_ID_PREFIX).towerman
+//
+// Base do grupo de Keychain (<este>.shared) e dos serviços do Keychain (<este>.token,
+// <este>.e2ee, <este>.e2ee.server). Mudar este valor depois de parear apaga os tokens guardados.
+// TOWERMAN_SHARED_ID = $(TOWERMAN_ID_PREFIX).towerman

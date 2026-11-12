@@ -1,0 +1,1198 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="dark">
+<title>Towerman</title>
+<style>
+:root {
+  --ground: #0b1626; --panel: #12223a; --raised: #1a2e4a; --line: #26405f; --text: #e3ebf5; --soft: #8ea3c0;
+  --amber: #ffb547; --on-amber: #1a1205; --green: #5bbf8a; --red: #f0645a; --blue: #5aa9ff; --parked: #6f7f99;
+  --mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
+  --gutter: clamp(12px, 2vw, 28px);
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; min-height: 100%; }
+body { background: var(--ground); color: var(--text); font: 15px/1.45 system-ui, -apple-system, "Segoe UI", Ubuntu, sans-serif; overflow-x: hidden; }
+@media (min-width: 1900px) { body { font-size: 16px; } }
+::selection { background: var(--blue); color: var(--ground); }
+button, input, textarea { font: inherit; color: inherit; }
+button { touch-action: manipulation; }
+:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
+[hidden] { display: none !important; }
+.label { font-size: 11px; font-weight: 600; letter-spacing: 1.6px; text-transform: uppercase; color: var(--soft); margin: 0 0 8px; }
+.label.amber { color: var(--amber); }
+.soft { color: var(--soft); }
+
+/* Cabeçalho: quebra em linhas numa janela estreita, nunca empurra a página para o lado. */
+header { display: flex; align-items: center; gap: 10px 18px; padding: 12px var(--gutter); border-bottom: 1px solid var(--line); flex-wrap: wrap; }
+header h1 { margin: 0; font-size: 22px; font-weight: 700; letter-spacing: -.2px; }
+.host { color: var(--soft); font-size: 14px; display: flex; align-items: center; gap: 6px; min-width: 0; }
+.host span:last-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.leds { display: flex; gap: 8px; flex-wrap: wrap; }
+.led { display: flex; align-items: baseline; gap: 6px; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 5px 10px; }
+.led b { font-size: 18px; font-variant-numeric: tabular-nums; color: var(--soft); }
+.led span { font-size: 11px; font-weight: 600; letter-spacing: 1px; color: var(--soft); text-transform: uppercase; }
+.led.amber.on { border-color: var(--amber); } .led.amber.on b { color: var(--amber); }
+.led.green.on b { color: var(--green); } .led.text.on b { color: var(--text); }
+.links { margin-left: auto; display: flex; gap: 8px; flex-wrap: wrap; }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 36px; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 6px 12px; color: var(--text); text-decoration: none; font-size: 14px; cursor: pointer; }
+.btn:hover { border-color: var(--blue); }
+.btn.blue { background: var(--blue); border-color: var(--blue); color: var(--ground); font-weight: 600; }
+.btn:disabled { opacity: .5; cursor: wait; }
+@media (max-width: 560px) {
+  header h1 { font-size: 19px; }
+  .leds { order: 3; width: 100%; } .led { flex: 1; justify-content: center; }
+  .links { margin-left: 0; width: 100%; order: 4; } .links .btn { flex: 1; }
+}
+
+/* Grelha: uma coluna (janela estreita), duas (portátil) ou três (monitor grande e ultrawide). */
+main { display: grid; gap: 20px; padding: 20px var(--gutter) 32px; max-width: 1560px; margin: 0 auto;
+  grid-template-columns: minmax(0, 1fr); grid-template-areas: "list" "detail" "radar"; }
+.area-radar { grid-area: radar; min-width: 0; }
+.area-list { grid-area: list; }
+.area-detail { grid-area: detail; min-width: 0; }
+.area-detail.none { display: none; }
+@media (min-width: 760px) {
+  main { grid-template-columns: minmax(280px, .9fr) minmax(0, 1.1fr); grid-template-rows: auto 1fr; grid-template-areas: "radar list" "radar detail"; align-items: start; }
+  .area-radar { position: sticky; top: 16px; }
+}
+@media (min-width: 1600px) {
+  main { max-width: 2400px; grid-template-columns: minmax(380px, 1fr) minmax(420px, 1fr) minmax(420px, 1fr); grid-template-rows: auto; grid-template-areas: "radar list detail"; }
+  .area-detail, .area-detail.none { display: block; position: sticky; top: 16px; }
+}
+@media (min-width: 2400px) { main { max-width: 2800px; grid-template-columns: minmax(420px, .9fr) minmax(480px, 1fr) minmax(480px, 1.1fr); } }
+
+.panel { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; }
+.radar { position: relative; padding: 12px; }
+.radar .label { position: absolute; top: 12px; left: 14px; }
+svg#radar { width: 100%; aspect-ratio: 1; display: block; max-height: min(78vh, 900px); margin: 0 auto; }
+@media (max-width: 759px) { svg#radar { max-height: 62vh; max-width: 560px; } }
+.ring { fill: none; stroke: var(--line); stroke-width: 2; }
+.ring.wait { stroke: rgba(255,181,71,.5); stroke-dasharray: 6 9; }
+.sector { stroke: var(--line); stroke-width: 2; }
+.sector-label { fill: var(--soft); font: 600 20px system-ui, sans-serif; letter-spacing: 1.5px; }
+svg.compact .sector-label { font-size: 30px; letter-spacing: 1px; }
+.sweep { transform-origin: 500px 500px; animation: spin 7s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.blip { cursor: pointer; }
+.blip .core { stroke: var(--panel); stroke-width: 3; }
+.blip .hollow { fill: none; stroke-width: 4; }
+.blip .pulse { fill: none; stroke: var(--amber); stroke-width: 4; transform-box: fill-box; transform-origin: center; animation: pulse 1.6s ease-out infinite; }
+@keyframes pulse { from { transform: scale(1); opacity: .8; } to { transform: scale(2.6); opacity: 0; } }
+.blip text { font: 20px system-ui, sans-serif; fill: var(--text); paint-order: stroke; stroke: var(--panel); stroke-width: 8px; }
+svg.compact .blip text { font-size: 32px; stroke-width: 10px; }
+.blip.wait text { fill: var(--amber); font-weight: 700; }
+.blip.sel .core, .blip.sel .hollow { stroke: var(--blue); stroke-width: 5; }
+.blip:focus-visible { outline: none; } .blip:focus-visible .core, .blip:focus-visible .hollow { stroke: var(--blue); stroke-width: 6; }
+.empty-radar { fill: var(--soft); font: 22px system-ui, sans-serif; }
+svg.compact .empty-radar { font-size: 34px; }
+@media (prefers-reduced-motion: reduce) { .sweep, .blip .pulse { animation: none; } .sweep { display: none; } }
+
+.col { display: flex; flex-direction: column; gap: 22px; min-width: 0; }
+.strips { display: grid; gap: 12px; grid-template-columns: minmax(0, 1fr); }
+.strip { background: var(--amber); color: var(--on-amber); border-radius: 14px; padding: 14px; min-width: 0; }
+.strip-h { display: flex; align-items: center; gap: 6px 8px; flex-wrap: wrap; }
+.strip-h b { font-size: 17px; min-width: 0; overflow-wrap: anywhere; }
+.strip-h small { margin-left: auto; font-size: 11px; font-weight: 700; letter-spacing: .8px; opacity: .8; text-transform: uppercase; }
+.dot { width: 10px; height: 10px; border-radius: 50%; background: currentColor; flex: none; }
+.strip h3 { margin: 10px 0 6px; font-size: 15px; }
+.cmd { font: 14px var(--mono); background: rgba(26,18,5,.1); border-radius: 8px; padding: 10px; white-space: pre-wrap; overflow-wrap: anywhere; max-height: 40vh; overflow: auto; }
+.ask { font-size: 15px; margin: 4px 0; overflow-wrap: anywhere; }
+.acts { display: flex; gap: 28px; margin-top: 12px; }
+.acts.stack { flex-direction: column; gap: 8px; }
+.a-btn { min-height: 46px; border-radius: 12px; font-weight: 600; font-size: 16px; cursor: pointer; border: 2px solid var(--on-amber); background: transparent; color: var(--on-amber); padding: 8px 12px; }
+.a-btn.primary { flex: 1; background: var(--on-amber); color: var(--amber); border-color: var(--on-amber); }
+.acts:not(.stack) .a-btn:not(.primary) { width: 110px; flex: none; }
+.acts.stack .a-btn { flex: none; width: 100%; text-align: left; }
+.a-btn small { display: block; font-weight: 500; font-size: 13px; opacity: .85; }
+.a-btn[aria-pressed="true"] { background: var(--on-amber); color: var(--amber); }
+.a-btn:disabled { opacity: .5; cursor: wait; }
+.q + .q { margin-top: 14px; padding-top: 10px; border-top: 1px solid rgba(26,18,5,.25); }
+.note { font-size: 13px; font-weight: 500; margin-top: 8px; min-height: 0; }
+.note:empty { display: none; }
+.reply { display: flex; gap: 8px; margin-top: 10px; }
+.reply textarea { flex: 1; min-width: 0; min-height: 44px; max-height: 40vh; resize: vertical; border-radius: 10px; padding: 9px 10px; border: 0; background: rgba(26,18,5,.1); }
+.reply textarea::placeholder { color: inherit; opacity: .65; }
+.panel .reply textarea { background: var(--ground); border: 1px solid var(--line); }
+.reply button { border: 0; border-radius: 10px; min-height: 44px; padding: 0 16px; font-weight: 600; cursor: pointer; background: var(--on-amber); color: var(--amber); }
+.panel .reply button { background: var(--blue); color: var(--ground); }
+.reply button:disabled { opacity: .5; cursor: wait; }
+.minor { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 10px; font-size: 13px; }
+.minor button { background: transparent; border: 1.5px solid var(--on-amber); border-radius: 8px; min-height: 34px; padding: 4px 12px; cursor: pointer; color: var(--on-amber); font-weight: 600; }
+
+.board { overflow: hidden; }
+.row { display: grid; grid-template-columns: 12px minmax(0,1fr) auto; gap: 4px 12px; align-items: center; padding: 10px 14px; min-height: 60px; border-top: 1px solid var(--line); cursor: pointer; background: var(--panel); }
+.swipe:first-child > .row { border-top: 0; }
+.row .tail { grid-column: 2 / -1; font-size: 12.5px; color: var(--soft); overflow: hidden; overflow-wrap: anywhere; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+.row .tail:empty { display: none; }
+
+/* Gestos: o cartão desliza com o dedo, o rato ou o trackpad; por baixo aparece a ação. */
+.swipe { position: relative; overflow: hidden; touch-action: pan-y; }
+.strips > .swipe { border-radius: 14px; }
+.swipe > .under { position: absolute; inset: 0; display: flex; align-items: center; padding: 0 22px; font-weight: 700; font-size: 15px; color: var(--ground); opacity: 0; pointer-events: none; }
+.swipe > .under.go-right { justify-content: flex-start; }
+.swipe > .under.go-left { justify-content: flex-end; }
+.swipe > .under.full { opacity: 1 !important; }
+.swipe > .card { position: relative; will-change: transform; }
+.swipe > .card:focus-visible { outline-offset: -3px; }
+.swipe > .card.back { transition: transform .18s ease-out; }
+body.swiping, body.swiping * { user-select: none; -webkit-user-select: none; cursor: grabbing; }
+@media (prefers-reduced-motion: reduce) { .swipe > .card.back { transition: none; } }
+
+/* Resposta rápida: menu pequeno junto ao cartão. */
+#quick { position: absolute; z-index: 9; width: min(340px, calc(100vw - 24px)); background: var(--raised); border: 1px solid var(--line); border-radius: 12px; padding: 10px; box-shadow: 0 10px 28px rgba(0,0,0,.5); color: var(--text); }
+#quick .q-h { font-size: 12px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; color: var(--soft); margin: 0 0 6px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+#quick .q-tail { margin: 0 0 8px; padding: 6px 8px; font-size: 13px; color: var(--soft); background: var(--ground); border: 1px solid var(--line); border-radius: 8px; white-space: pre-wrap; overflow-wrap: anywhere; max-height: 9em; overflow: auto; }
+#quick .q-tail:empty { display: none; }
+#quick .q-list { display: grid; gap: 6px; }
+#quick button { min-height: 38px; border-radius: 8px; border: 1px solid var(--line); background: var(--panel); color: var(--text); text-align: left; padding: 6px 10px; cursor: pointer; }
+#quick button:hover { border-color: var(--blue); }
+#quick button.phrase { font-weight: 600; }
+#quick .q-row { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px; }
+#quick .q-row button { flex: 1; text-align: center; }
+#quick textarea { width: 100%; min-height: 8em; resize: vertical; border-radius: 8px; border: 1px solid var(--line); background: var(--ground); padding: 8px; }
+.row:hover, .row.sel { background: var(--raised); }
+.row.sel { box-shadow: inset 3px 0 0 var(--blue); }
+.row .name { font-weight: 600; display: flex; align-items: center; gap: 6px; min-width: 0; }
+.row .name > span:first-child { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.row .act { color: var(--soft); font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.row .right { text-align: right; display: flex; flex-direction: column; align-items: flex-end; gap: 3px; }
+.row .right small { color: var(--soft); font-size: 11px; letter-spacing: 1px; text-transform: uppercase; white-space: nowrap; }
+.badge { display: inline-flex; align-items: center; gap: 4px; font-size: 10.5px; font-weight: 700; letter-spacing: .8px; text-transform: uppercase; padding: 1px 6px; border-radius: 999px; border: 1px solid currentColor; opacity: .85; white-space: nowrap; flex: none; }
+.badge i { width: 6px; height: 6px; background: currentColor; display: inline-block; }
+.badge i.claude, .badge i.other { border-radius: 50%; }
+.badge i.codex { border-radius: 1.5px; }
+.badge i.agy, .badge i.antigravity { transform: rotate(45deg) scale(.85); }
+.tag { font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; padding: 2px 6px; border-radius: 4px; border: 1px solid var(--line); background: var(--ground); white-space: nowrap; }
+.tag.wait { background: var(--amber); color: var(--on-amber); border-color: var(--amber); }
+.blip-dot { width: 10px; height: 10px; border-radius: 50%; }
+.blip-dot.hollow { border: 2px solid var(--parked); }
+.blip-dot.k-codex { border-radius: 2px; }
+.blip-dot.k-agy, .blip-dot.k-antigravity { border-radius: 1px; transform: rotate(45deg) scale(.85); }
+.empty { color: var(--soft); padding: 18px; }
+
+.detail { padding: 16px; }
+.detail-h { display: flex; align-items: flex-start; gap: 10px; }
+.detail h2 { margin: 0 0 2px; font-size: 18px; flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.x { flex: none; width: 36px; height: 36px; border-radius: 8px; border: 1px solid var(--line); background: transparent; color: var(--soft); font-size: 20px; line-height: 1; cursor: pointer; }
+.x:hover { border-color: var(--blue); color: var(--text); }
+.meta { color: var(--soft); font-size: 13px; display: grid; gap: 4px; margin: 6px 0 12px; }
+.meta > span { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.meta code { font: 12px var(--mono); overflow-wrap: anywhere; }
+.ctx { display: grid; gap: 10px; margin-bottom: 12px; }
+.ctx section { background: var(--ground); border: 1px solid var(--line); border-radius: 10px; padding: 8px 10px; min-width: 0; }
+.ctx .label { margin-bottom: 4px; }
+.ctx p { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; max-height: 11.5em; overflow: auto; font-size: 14px; }
+.ctx .now { border-color: var(--green); }
+.ctx .wait-hint { border-color: var(--amber); color: var(--amber); }
+details.talk-box { margin-bottom: 4px; }
+details.talk-box summary { cursor: pointer; color: var(--soft); font-size: 13px; min-height: 32px; display: flex; align-items: center; }
+.talk { max-height: min(46vh, 520px); overflow: auto; background: var(--ground); border: 1px solid var(--line); border-radius: 10px; padding: 8px 10px; font-size: 13px; margin-top: 6px; }
+.talk p { margin: 0 0 8px; white-space: pre-wrap; overflow-wrap: anywhere; } .talk .who { color: var(--soft); font-size: 11px; letter-spacing: 1px; text-transform: uppercase; }
+.detail .tools { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+.detail .note { color: var(--soft); }
+.detail-empty { color: var(--soft); padding: 18px; }
+
+.offline { margin: 16px var(--gutter) 0; padding: 12px 14px; border: 1px solid var(--red); border-radius: 12px; color: var(--text); }
+.toast { position: fixed; left: 50%; bottom: 20px; transform: translateX(-50%); background: var(--raised); border: 1px solid var(--green); color: var(--text); border-radius: 10px; padding: 10px 16px; max-width: calc(100vw - 32px); z-index: 10; box-shadow: 0 8px 24px rgba(0,0,0,.4); }
+
+/* Pareamento: um diálogo dentro do deck, nunca uma página sem saída. */
+dialog#pair { width: min(480px, calc(100vw - 24px)); max-height: calc(100vh - 24px); overflow: auto; padding: 18px; border-radius: 16px; border: 1px solid var(--line); background: var(--panel); color: var(--text); }
+dialog#pair::backdrop { background: rgba(5, 10, 20, .72); }
+.dlg-h { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
+.dlg-h h2 { margin: 0; font-size: 19px; flex: 1; }
+.dlg-p { color: var(--soft); margin: 6px 0 12px; font-size: 14px; }
+.qr-box { position: relative; display: grid; place-items: center; background: #fff; border-radius: 14px; padding: 12px; width: min(324px, 100%); aspect-ratio: 1; margin: 0 auto; }
+.qr-box img { width: 100%; height: 100%; image-rendering: pixelated; display: block; }
+.qr-box.off img { opacity: .08; }
+.qr-msg { position: absolute; inset: 12px; display: grid; place-items: center; text-align: center; color: #0b1626; font-weight: 600; padding: 12px; }
+.qr-msg:empty { display: none; }
+.pair-st { text-align: center; margin: 12px 0 0; font-size: 14px; min-height: 1.45em; }
+.pair-st.ok { color: var(--green); font-weight: 600; font-size: 16px; }
+.pair-st.err { color: var(--red); }
+.dlg-acts { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; margin: 12px 0 4px; }
+.devs { list-style: none; margin: 0; padding: 0; border: 1px solid var(--line); border-radius: 10px; }
+.devs li { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-top: 1px solid var(--line); min-height: 48px; }
+.devs li:first-child { border-top: 0; }
+.devs li div { flex: 1; min-width: 0; }
+.devs li b { display: block; overflow-wrap: anywhere; }
+.devs li small { color: var(--soft); }
+.devs li.novo { background: rgba(91,191,138,.12); }
+.devs .empty { padding: 10px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Towerman</h1>
+  <span class="host"><span class="dot" id="live" style="color:var(--parked)" aria-hidden="true"></span><span id="host">a ligar…</span></span>
+  <div class="leds" role="status" aria-label="Contadores">
+    <div class="led amber" id="c-wait"><b>0</b><span>À espera</span></div>
+    <div class="led green" id="c-run"><b>0</b><span>Em curso</span></div>
+    <div class="led text" id="c-park"><b>0</b><span>Parados</span></div>
+  </div>
+  <nav class="links">
+    <button class="btn" type="button" id="open-pair">Parear iPhone</button>
+    <a class="btn" href="/" target="_blank" rel="noopener" title="Abre noutra janela; o deck continua aqui">Painel clássico ↗</a>
+  </nav>
+</header>
+<div class="offline" id="offline" role="alert" hidden></div>
+<main>
+  <section class="area-radar panel radar" aria-label="Radar das sessões por repositório">
+    <p class="label">Radar</p>
+    <svg id="radar" viewBox="0 0 1000 1000" role="img" aria-label="Radar"></svg>
+  </section>
+  <div class="area-list col">
+    <section id="waiting-sec" hidden>
+      <p class="label amber">Aguardando você</p>
+      <div class="strips" id="strips"></div>
+    </section>
+    <section>
+      <p class="label">Partidas</p>
+      <div class="panel board" id="board"></div>
+    </section>
+  </div>
+  <section class="area-detail none" id="detail-sec" aria-label="Agente escolhido">
+    <p class="label">Agente</p>
+    <div class="panel detail" id="detail"></div>
+  </section>
+</main>
+
+<dialog id="pair" aria-labelledby="pair-t">
+  <div class="dlg-h">
+    <h2 id="pair-t">Parear iPhone</h2>
+    <button class="btn" type="button" id="pair-back">← Voltar ao deck</button>
+  </div>
+  <p class="dlg-p">No iPhone, aponte a câmara (ou Towerman › Adicionar computador) para o código. O iPhone tem de estar na mesma rede Wi-Fi que este computador.</p>
+  <div class="qr-box" id="qr-box"><img id="pair-img" alt="Código QR de pareamento"><div class="qr-msg" id="qr-msg"></div></div>
+  <p class="pair-st" id="pair-st" role="status"></p>
+  <div class="dlg-acts"><button class="btn" type="button" id="pair-new">Gerar outro código</button></div>
+  <p class="label" style="margin-top:14px">Aparelhos pareados</p>
+  <ul class="devs" id="pair-list"><li class="empty">A carregar…</li></ul>
+</dialog>
+
+<script>
+"use strict";
+const $ = (id) => document.getElementById(id);
+const NS = "http://www.w3.org/2000/svg";
+const RING = { a_espera: 150, ativa: 290, parada: 410 };
+const TAG = { a_espera: ["Espera", "var(--on-amber)"], ativa: ["Em curso", "var(--green)"], parada: ["Parado", "var(--parked)"] };
+let sessions = [], requests = new Map(), decisions = new Map(), selected = null, notes = new Map(), drafts = new Map();
+let semSessao = false;
+
+function el(tag, props, ...kids) {
+  const e = document.createElement(tag);
+  for (const [k, v] of Object.entries(props || {})) {
+    if (k === "class") e.className = v; else if (k.startsWith("on")) e[k] = v; else if (k === "text") e.textContent = v; else e.setAttribute(k, v);
+  }
+  for (const k of kids) if (k != null) e.append(k);
+  return e;
+}
+function svg(tag, attrs, ...kids) {
+  const e = document.createElementNS(NS, tag);
+  for (const [k, v] of Object.entries(attrs || {})) e.setAttribute(k, v);
+  for (const k of kids) if (k != null) e.append(k);
+  return e;
+}
+function since(iso) {
+  const s = (Date.now() - Date.parse(iso)) / 1000;
+  if (!isFinite(s)) return "";
+  if (s < 60) return "agora";
+  if (s < 3600) return Math.floor(s / 60) + " min";
+  if (s < 86400) return Math.floor(s / 3600) + " h " + String(Math.floor(s / 60) % 60).padStart(2, "0");
+  return Math.floor(s / 86400) + " d";
+}
+const cut = (t, n) => { t = String(t || "").trim(); return t.length > n ? t.slice(0, n - 1) + "…" : t; };
+const name = (s) => s.nome || s.id.slice(0, 8);
+// Origem do agente: a forma diz o agente (círculo, quadrado, losango); a cor continua a ser o estado.
+const KIND = { claude: ["Claude", "Claude Code"], codex: ["Codex", "Codex"], agy: ["agy", "Antigravity CLI"], antigravity: ["AG·IDE", "Antigravity IDE"] };
+const kindOf = (s) => KIND[s.agente] ? s.agente : "other";
+function badge(s, style) {
+  const k = kindOf(s);
+  return el("span", { class: "badge", title: (KIND[k] || ["", "Agente"])[1], style: style || "" }, el("i", { class: k }), (KIND[k] || ["Agente"])[0]);
+}
+// Ativa com clique, Enter ou Espaço (para linhas e pontos com role=button).
+function onActivate(node, fn) {
+  node.onclick = fn;
+  node.onkeydown = (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); fn(); } };
+}
+// Forma do ponto no radar, centrada em (x, y) com raio r.
+function shape(k, x, y, r, attrs) {
+  if (k === "codex") return svg("rect", { x: x - r * .9, y: y - r * .9, width: r * 1.8, height: r * 1.8, rx: r * .3, ...attrs });
+  if (k === "agy" || k === "antigravity") {
+    const q = r * 1.2;
+    return svg("polygon", { points: `${x},${y - q} ${x + q},${y} ${x},${y + q} ${x - q},${y}`, ...attrs });
+  }
+  return svg("circle", { cx: x, cy: y, r, ...attrs });
+}
+function showOffline(msg) {
+  const o = $("offline");
+  o.hidden = !msg;
+  o.textContent = msg || "";
+}
+// Sem sessão (cookie expirado ou token trocado), ir para "/" deixava a janela de app sem saída.
+// Fica-se no deck com a explicação.
+function lostSession() {
+  semSessao = true;
+  showOffline("A sessão deste painel expirou. Feche esta janela e abra de novo com «towerman deck» (ou o atalho Towerman).");
+  throw new Error("sem sessão");
+}
+async function get(url) {
+  const r = await fetch(url, { credentials: "same-origin", cache: "no-store" });
+  if (r.status === 401) lostSession();
+  if (!r.ok) { const j = await r.json().catch(() => ({})); throw new Error(j.erro || "o serviço respondeu " + r.status); }
+  return r.json();
+}
+async function post(url, body) {
+  const r = await fetch(url, { method: "POST", credentials: "same-origin", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body || {}) });
+  if (r.status === 401) lostSession();
+  const j = await r.json().catch(() => ({}));
+  if (!r.ok) { const e = new Error(j.erro || "o serviço respondeu " + r.status); e.status = r.status; throw e; }
+  return j;
+}
+function toast(msg) {
+  const t = el("div", { class: "toast", role: "status", text: msg });
+  document.body.append(t);
+  setTimeout(() => t.remove(), 4000);
+}
+
+let loading = null, again = false;
+async function load() {
+  if (loading) { again = true; return loading; }
+  loading = (async () => {
+    try {
+      const [repos, painel] = await Promise.all([get("/v1/sessoes"), get("/v1/painel")]);
+      const list = [];
+      for (const r of repos || []) for (const w of r.worktrees || []) for (const s of w.sessoes || []) if (s.estado !== "terminada") list.push({ ...s, repo: r.nome });
+      sessions = list;
+      requests = new Map();
+      for (const p of painel.permissoes || []) if (!requests.has(p.session_id)) requests.set(p.session_id, p);
+      // Decisões em texto livre no fim do turno («Digite CONTINUAR», menus, «Posso começar?»).
+      decisions = new Map();
+      for (const d of painel.decisoes || []) decisions.set(d.session_id, d);
+      for (const s of sessions) if (requests.has(s.id) || decisions.has(s.id)) s.estado = "a_espera";
+      if (!semSessao) showOffline("");
+      render();
+    } catch (e) {
+      if (!semSessao) showOffline("Sem ligação ao serviço do Towerman (" + e.message + "). A tentar de novo…");
+    }
+  })();
+  await loading;
+  loading = null;
+  if (again) { again = false; return load(); }
+}
+
+function render() {
+  const n = { a_espera: 0, ativa: 0, parada: 0 };
+  for (const s of sessions) n[s.estado] = (n[s.estado] || 0) + 1;
+  for (const [id, k] of [["c-wait", "a_espera"], ["c-run", "ativa"], ["c-park", "parada"]]) {
+    $(id).querySelector("b").textContent = n[k];
+    $(id).classList.toggle("on", n[k] > 0);
+  }
+  document.title = (n.a_espera ? "(" + n.a_espera + ") " : "") + "Towerman";
+  drawRadar();
+  drawStrips();
+  drawBoard();
+  drawDetail();
+  if (Q.node && !sessions.some((x) => x.id === Q.id)) closeQuick();
+}
+
+function polar(r, deg) { const a = (deg - 90) * Math.PI / 180; return [500 + r * Math.cos(a), 500 + r * Math.sin(a)]; }
+
+// O radar: um sector por repositório; o anel interior (tracejado âmbar) é quem aguarda você.
+// Num radar pequeno (janela estreita), a letra cresce no desenho e os nomes encurtam, para continuarem legíveis.
+function drawRadar() {
+  const r = $("radar");
+  const compact = r.clientWidth > 0 && r.clientWidth < 480;
+  r.classList.toggle("compact", compact);
+  r.replaceChildren();
+  const defs = svg("defs", {});
+  defs.innerHTML = '<linearGradient id="cone" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#5aa9ff" stop-opacity="0"/><stop offset="1" stop-color="#5aa9ff" stop-opacity=".18"/></linearGradient>';
+  r.append(defs);
+  for (const k of ["a_espera", "ativa", "parada"]) r.append(svg("circle", { cx: 500, cy: 500, r: RING[k], class: "ring" + (k === "a_espera" ? " wait" : "") }));
+  r.append(svg("circle", { cx: 500, cy: 500, r: 470, class: "ring" }));
+  const [ex, ey] = polar(470, 0), [sx, sy] = polar(470, -32);
+  r.append(svg("g", { class: "sweep" }, svg("path", { d: `M500,500 L${sx},${sy} A470,470 0 0,1 ${ex},${ey} Z`, fill: "url(#cone)" }),
+    svg("line", { x1: 500, y1: 500, x2: ex, y2: ey, stroke: "#5aa9ff", "stroke-opacity": ".7", "stroke-width": 3 })));
+  r.append(svg("circle", { cx: 500, cy: 500, r: 6, fill: "#8ea3c0" }));
+  const byRepo = new Map();
+  for (const s of sessions) { if (!byRepo.has(s.repo)) byRepo.set(s.repo, []); byRepo.get(s.repo).push(s); }
+  const repos = [...byRepo.keys()].sort();
+  if (!repos.length) { r.append(svg("text", { x: 500, y: 560, "text-anchor": "middle", class: "empty-radar" }, "Céu limpo: nenhuma sessão viva.")); return; }
+  const span = 360 / repos.length;
+  const maxRepo = compact ? 11 : 16, maxName = compact ? 10 : 18;
+  repos.forEach((repo, i) => {
+    const start = i * span;
+    if (repos.length > 1) { const [x, y] = polar(470, start); r.append(svg("line", { x1: 500, y1: 500, x2: x, y2: y, class: "sector" })); }
+    // O nome do repositório fica junto à fronteira do sector, por dentro do anel: nunca sai do
+    // desenho nem cobre um ponto (os pontos ficam no meio do sector).
+    const at = start + Math.min(span * 0.16, 30);
+    const [lx, ly] = polar(452, at);
+    // O texto cresce sempre para dentro do radar, para nunca sair pelo bordo.
+    r.append(svg("text", { x: lx + (lx >= 500 ? -14 : 14), y: ly + 7, "text-anchor": lx >= 500 ? "end" : "start", class: "sector-label" }, cut(repo, maxRepo).toUpperCase()));
+    const groups = {};
+    for (const s of byRepo.get(repo)) (groups[s.estado] = groups[s.estado] || []).push(s);
+    for (const [estado, group] of Object.entries(groups)) group.forEach((s, j) => {
+      const ang = start + span * (j + 1) / (group.length + 1);
+      const [x, y] = polar(RING[estado] || RING.parada, ang);
+      const wait = estado === "a_espera", run = estado === "ativa";
+      const color = wait ? "#ffb547" : run ? "#5bbf8a" : "#6f7f99";
+      const g = svg("g", { class: "blip" + (wait ? " wait" : "") + (selected === s.id ? " sel" : ""), tabindex: 0, role: "button", "aria-label": name(s) + ", " + (KIND[kindOf(s)] || ["", "Agente"])[1] + ", " + (TAG[estado] || TAG.parada)[0] });
+      const k = kindOf(s);
+      if (wait) g.append(shape(k, x, y, 14, { class: "pulse" }));
+      g.append(run || wait ? shape(k, x, y, wait ? 14 : 10, { fill: color, class: "core" }) : shape(k, x, y, 9, { stroke: color, class: "hollow" }));
+      // Alvo de clique maior que o ponto, invisível.
+      g.append(svg("circle", { cx: x, cy: y, r: compact ? 40 : 26, fill: "transparent" }));
+      const left = x < 500;
+      g.append(svg("text", { x: x + (left ? -24 : 24), y: y + 7, "text-anchor": left ? "end" : "start" }, cut(name(s), maxName)));
+      onActivate(g, () => select(s.id));
+      r.append(g);
+    });
+  });
+}
+
+// Responder a um pedido. Se já foi decidido noutro lado (terminal, iPhone), diz isso e atualiza.
+function decide(req, body, buttons, note) {
+  buttons.forEach((b) => b.disabled = true);
+  note.textContent = "A enviar…";
+  post("/v1/permissoes/" + req.id, body).then(() => { note.textContent = ""; load(); }).catch((e) => {
+    note.textContent = "Não foi possível responder: " + e.message + ".";
+    if (e.status === 409 || e.status === 410) { setTimeout(load, 1500); return; }
+    buttons.forEach((b) => b.disabled = false);
+  });
+}
+
+function replyBox(s) {
+  const ta = el("textarea", { placeholder: "Mandar texto ao agente… (Ctrl+Enter envia)", rows: 1, "aria-label": "Mandar texto a " + name(s) });
+  ta.value = drafts.get(s.id) || "";
+  ta.oninput = () => drafts.set(s.id, ta.value);
+  const note = el("div", { class: "note", role: "status" });
+  const send = el("button", { type: "button", text: "Enviar" });
+  const go = async () => {
+    const texto = ta.value.trim();
+    if (!texto) { note.textContent = "Escreva o texto antes de enviar."; ta.focus(); return; }
+    send.disabled = true;
+    note.textContent = "A enviar…";
+    try {
+      const m = await post("/v1/sessoes/" + encodeURIComponent(s.id) + "/mensagens", { texto });
+      notes.set(s.id, m.estado === "entregue" ? "Entregue no terminal." : "Na fila: " + (m.motivo || "entra quando o passo atual terminar") + ".");
+      drafts.delete(s.id);
+      ta.value = "";
+    } catch (e) { notes.set(s.id, "Não foi possível enviar: " + e.message + "."); }
+    send.disabled = false;
+    note.textContent = notes.get(s.id) || "";
+  };
+  send.onclick = go;
+  ta.onkeydown = (e) => { if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) { e.preventDefault(); go(); } };
+  note.textContent = notes.get(s.id) || "";
+  return [el("div", { class: "reply" }, ta, send), note];
+}
+
+async function focus(s, note, btn) {
+  if (btn) btn.disabled = true;
+  note.textContent = "A procurar o terminal…";
+  try {
+    const r = await post("/v1/sessoes/" + encodeURIComponent(s.id) + "/focar");
+    note.textContent = r.ok ? "Terminal em primeiro plano." : "Não consegui focar: " + (r.erro || "não encontrei o terminal desta sessão") + ".";
+  } catch (e) { note.textContent = "Não consegui focar: " + e.message + "."; }
+  if (btn) btn.disabled = false;
+}
+function focusButton(s, note, text, cls) {
+  const f = el("button", { type: "button", class: cls || "", text });
+  f.onclick = () => focus(s, note, f);
+  return f;
+}
+
+// Perguntas do AskUserQuestion. Uma pergunta de escolha única responde-se com um clique;
+// várias perguntas (ou escolha múltipla) escolhem-se primeiro e enviam-se juntas.
+function questionBlock(strip, req, s, qs, note) {
+  const simple = qs.length === 1 && !qs[0].multiSelect;
+  const chosen = qs.map(() => new Set());
+  const all = [];
+  const submit = el("button", { type: "button", class: "a-btn primary", text: "Enviar respostas", disabled: "" });
+  const refresh = () => { submit.disabled = !chosen.every((c) => c.size > 0); };
+  qs.forEach((q, qi) => {
+    const box = el("div", { class: "q" }, el("h3", { text: q.header || "Pergunta" }), el("p", { class: "ask", text: q.question || "" }));
+    const acts = el("div", { class: "acts stack", role: "group", "aria-label": q.question || "Opções" });
+    (q.options || []).forEach((o, i) => {
+      const b = el("button", { type: "button", class: "a-btn" + (simple && i === 0 ? " primary" : "") }, o.label, o.description ? el("small", { text: o.description }) : null);
+      if (!simple) b.setAttribute("aria-pressed", "false");
+      b.onclick = () => {
+        if (simple) { decide(req, { decisao: "allow", respostas: { [q.question]: o.label } }, all, note); return; }
+        const c = chosen[qi];
+        if (q.multiSelect) { c.has(o.label) ? c.delete(o.label) : c.add(o.label); }
+        else { c.clear(); c.add(o.label); }
+        acts.querySelectorAll("button").forEach((x, xi) => x.setAttribute("aria-pressed", String(c.has(q.options[xi].label))));
+        refresh();
+      };
+      all.push(b);
+      acts.append(b);
+    });
+    if (!(q.options || []).length) acts.append(el("p", { class: "ask", text: "Sem opções: responda no terminal." }));
+    box.append(acts);
+    strip.append(box);
+  });
+  if (!simple) {
+    all.push(submit);
+    submit.onclick = () => {
+      const respostas = {};
+      qs.forEach((q, i) => { respostas[q.question] = [...chosen[i]].join(", "); });
+      decide(req, { decisao: "allow", respostas }, all, note);
+    };
+    strip.append(el("div", { class: "acts" }, submit));
+  }
+}
+
+// Decisão em texto livre: um botão por opção (o texto vai ao terminal), mais a caixa de texto para
+// responder outra coisa. Num terminal que não aceita texto, os botões ficam desativados com o motivo.
+function answerDecision(s, dec, key, buttons, note) {
+  buttons.forEach((b) => b.disabled = true);
+  note.textContent = "A enviar…";
+  post("/v1/sessoes/" + encodeURIComponent(s.id) + "/decisao", { id: dec.id, chave: key }).then(() => { note.textContent = ""; load(); }).catch((e) => {
+    note.textContent = "Não foi possível responder: " + e.message + ".";
+    if (e.status === 409) setTimeout(load, 1500);
+    buttons.forEach((b) => b.disabled = b.dataset.off === "1");
+  });
+}
+function decisionBlock(strip, s, dec, note) {
+  strip.append(el("h3", { text: dec.title || "Decisão" }), el("p", { class: "ask", text: dec.detail || "" }));
+  const opts = dec.options || [];
+  if (opts.length) {
+    const all = [];
+    const acts = el("div", { class: "acts" + (opts.length > 2 ? " stack" : ""), role: "group", "aria-label": dec.detail || "Opções" });
+    opts.forEach((o, i) => {
+      const b = el("button", { type: "button", class: "a-btn" + (i === 0 ? " primary" : ""), text: o.label });
+      if (o.disabled) { b.disabled = true; b.dataset.off = "1"; }
+      b.onclick = () => answerDecision(s, dec, o.key, all, note);
+      all.push(b);
+      acts.append(b);
+    });
+    strip.append(acts);
+  }
+  if (dec.context) strip.append(el("p", { class: "ask", text: "Botões desativados: " + dec.context + ". Foque o terminal e responda lá." }));
+  strip.append(...replyBox(s));
+}
+
+// Faixas âmbar: o que aguarda você, com o comando exato e a resposta à mão. Cada faixa é
+// reaproveitada enquanto o pedido for o mesmo, para não apagar o que se está a escrever.
+const stripCache = new Map();
+function drawStrips() {
+  const box = $("strips");
+  const waiting = sessions.filter((s) => s.estado === "a_espera");
+  $("waiting-sec").hidden = waiting.length === 0;
+  const keep = new Set();
+  const nodes = waiting.map((s) => {
+    const req = requests.get(s.id);
+    const dec = req ? null : decisions.get(s.id);
+    const key = s.id + "|" + (req ? "p" + req.id : dec ? dec.id + "|" + (dec.context || "") : "m|" + (s.resumo || ""));
+    keep.add(key);
+    let c = stripCache.get(key);
+    if (!c) { c = buildStrip(s, req, dec); stripCache.set(key, c); }
+    c.when.textContent = [s.repo, s.branch, since(req ? req.pedida_em : dec ? dec.criada_em : s.visto_em)].filter(Boolean).join(" · ");
+    return c.node;
+  });
+  for (const k of [...stripCache.keys()]) if (!keep.has(k)) stripCache.delete(k);
+  const same = nodes.length === box.children.length && nodes.every((n, i) => box.children[i] === n);
+  if (!same) box.replaceChildren(...nodes);
+}
+function buildStrip(s, req, dec) {
+  let two = null;
+  const note = el("div", { class: "note", role: "status" });
+  const when = el("small");
+  const strip = el("article", { class: "strip", "aria-label": name(s) + ", aguardando você" },
+    el("div", { class: "strip-h" }, el("span", { class: "dot" }), el("b", { text: name(s) }), badge(s, "color: var(--on-amber)"), when));
+  if (req) {
+    const qs = req.ferramenta === "AskUserQuestion" && req.entrada && Array.isArray(req.entrada.questions) ? req.entrada.questions : null;
+    if (qs && qs.length) {
+      questionBlock(strip, req, s, qs, note);
+    } else {
+      strip.append(el("h3", { text: (req.ferramenta || "Pedido") + "?" }), el("div", { class: "cmd", text: req.resumo || "(sem detalhe)" }));
+      const allow = el("button", { type: "button", class: "a-btn primary", text: "Permitir" });
+      const deny = el("button", { type: "button", class: "a-btn", text: "Negar" });
+      allow.onclick = () => decide(req, { decisao: "allow" }, [allow, deny], note);
+      deny.onclick = () => decide(req, { decisao: "deny" }, [allow, deny], note);
+      strip.append(el("div", { class: "acts" }, allow, deny));
+      // Pedido de permissão com duas opções: o gesto carrega no mesmo botão (mesmo POST, mesmo 409/410).
+      two = { allow, deny };
+    }
+  } else if (dec) {
+    decisionBlock(strip, s, dec, note);
+  } else {
+    if (s.resumo) strip.append(el("p", { class: "ask", text: s.resumo }));
+    strip.append(...replyBox(s));
+  }
+  const fbtn = focusButton(s, note, "Focar");
+  strip.append(note, el("div", { class: "minor" }, el("span", { text: "Ou responda no terminal." }), fbtn));
+  if (dec) {
+    const nao = el("button", { type: "button", text: "Não é pergunta" });
+    nao.onclick = () => answerDecision(s, dec, "dismiss", [nao], note);
+    strip.querySelector(".minor").append(nao);
+  }
+  const ver = el("button", { type: "button", text: "Contexto" });
+  ver.onclick = () => select(s.id, true);
+  strip.querySelector(".minor").append(ver);
+  const actions = two ? () => ({
+    right: { label: "Permitir", color: "var(--green)", run: () => { if (!two.allow.disabled) two.allow.onclick(); } },
+    left: { label: "Negar", color: "var(--red)", run: () => { if (!two.deny.disabled) two.deny.onclick(); } },
+  }) : () => ({
+    right: { label: "Focar", color: "var(--blue)", run: () => { if (!fbtn.disabled) fbtn.onclick(); } },
+    left: quickAction(s.id),
+  });
+  strip.tabIndex = 0;
+  return { node: swipeable(strip, actions), when };
+}
+
+function drawBoard() {
+  const box = $("board");
+  const order = (s) => (s.estado === "ativa" ? 0 : 1);
+  const rest = sessions.filter((s) => s.estado !== "a_espera").sort((a, b) => order(a) - order(b) || String(b.visto_em || "").localeCompare(String(a.visto_em || "")));
+  // Durante um gesto não se refaz a lista (o cartão sairia de baixo do dedo); refaz-se no fim.
+  if (G && G.board) { boardDirty = true; return; }
+  boardDirty = false;
+  const keepFocus = document.activeElement && box.contains(document.activeElement) ? document.activeElement.dataset.id : null;
+  if (tailSeen) tailSeen.disconnect();
+  box.replaceChildren();
+  if (!rest.length) { box.append(el("div", { class: "empty", text: sessions.length ? "Todos os agentes aguardam você." : "Céu limpo. Abra uma sessão do Claude Code, do Codex ou do Antigravity e ela aparece no radar." })); return; }
+  for (const s of rest) {
+    const [label, color] = TAG[s.estado] || TAG.parada;
+    const run = s.estado === "ativa";
+    const row = el("div", { class: "row" + (selected === s.id ? " sel" : ""), tabindex: 0, role: "button", "aria-pressed": String(selected === s.id), "data-id": s.id },
+      el("span", { class: "blip-dot" + (run ? "" : " hollow") + " k-" + kindOf(s), style: run ? "background:var(--green)" : "" }),
+      el("div", { style: "min-width:0" }, el("div", { class: "name" }, el("span", { text: name(s) }), badge(s, "color: var(--soft)")), el("div", { class: "act", text: s.resumo || [s.repo, s.branch].filter(Boolean).join(" · ") })),
+      el("div", { class: "right" }, el("span", { class: "tag", style: "color:" + color, text: label }), el("small", { text: since(s.visto_em) })),
+      el("div", { class: "tail", text: tailOf(s.id, 140, true) }));
+    onActivate(row, () => select(s.id));
+    box.append(swipeable(row, () => ({
+      right: { label: "Focar", color: "var(--blue)", run: () => focus(s, toastNote()) },
+      left: quickAction(s.id),
+    })));
+    if (tailSeen) tailSeen.observe(row);
+    if (keepFocus === s.id) row.focus({ preventScroll: true });
+  }
+}
+
+function select(id, force) {
+  selected = selected === id && !force ? null : id;
+  render();
+  if (selected) {
+    fetchTalk(selected, true);
+    const sec = $("detail-sec");
+    if (getComputedStyle(sec).position !== "sticky") sec.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  }
+}
+
+// Conversa da sessão escolhida: guardada aqui e pedida de novo quando o serviço avisa uma mudança
+// (no máximo uma vez a cada 3 s). Só a parte da conversa é redesenhada; a caixa de texto fica.
+const talks = new Map();
+async function fetchTalk(id, force) {
+  const c = talks.get(id) || {};
+  if (c.busy || (!force && c.at && Date.now() - c.at < 3000)) return;
+  c.busy = true;
+  talks.set(id, c);
+  try {
+    const r = await get("/v1/sessoes/" + encodeURIComponent(id) + "/conversa");
+    c.data = r; c.err = null;
+  } catch (e) { c.err = e.message; }
+  c.busy = false;
+  c.at = Date.now();
+  if (selected === id) fillTalk();
+  paintTail(id);
+}
+
+let D = null; // referências do painel do agente aberto
+function drawDetail() {
+  const sec = $("detail-sec"), box = $("detail");
+  const s = sessions.find((x) => x.id === selected);
+  if (!s) {
+    if (selected) selected = null; // a sessão terminou
+    sec.classList.add("none");
+    if (D || !box.firstChild) { D = null; box.replaceChildren(el("div", { class: "detail-empty", text: "Escolha um agente no radar ou nas partidas para ver o último pedido, a última resposta e mandar texto." })); }
+    return;
+  }
+  sec.classList.remove("none");
+  if (!D || D.id !== s.id) {
+    const note = el("div", { class: "note", role: "status" });
+    const close = el("button", { type: "button", class: "x", "aria-label": "Fechar o agente", title: "Fechar (Esc)", text: "×" });
+    close.onclick = () => { selected = null; render(); };
+    const meta = el("div", { class: "meta" });
+    const ctx = el("div", { class: "ctx" });
+    const talk = el("div", { class: "talk" });
+    const summary = el("summary", { text: "Conversa recente" });
+    const det = el("details", { class: "talk-box" }, summary, talk);
+    const refresh = el("button", { type: "button", class: "btn", text: "Atualizar conversa" });
+    refresh.onclick = () => { ctx.replaceChildren(el("p", { class: "soft", text: "A carregar…" })); fetchTalk(s.id, true); };
+    D = { id: s.id, meta, ctx, talk, summary, h2: el("h2", { text: name(s) }) };
+    box.replaceChildren(el("div", { class: "detail-h" }, D.h2, close), meta, ctx, det, ...replyBox(s),
+      el("div", { class: "tools" }, focusButton(s, note, "Focar no computador", "btn"), refresh), note);
+    ctx.append(el("p", { class: "soft", text: "A carregar a conversa…" }));
+    if (!talks.has(s.id)) fetchTalk(s.id, true);
+  }
+  D.h2.textContent = name(s);
+  const [label, color] = TAG[s.estado] || TAG.parada;
+  D.meta.replaceChildren(
+    el("span", {}, badge(s, "color: var(--soft)"), el("span", { class: "tag" + (s.estado === "a_espera" ? " wait" : ""), style: s.estado === "a_espera" ? "" : "color:" + color, text: label }),
+      el("span", { text: [s.repo, s.branch, since(s.visto_em)].filter(Boolean).join(" · ") })),
+    s.cwd ? el("code", { text: s.cwd }) : null);
+  D.waiting = s.estado === "a_espera";
+  D.resumo = s.resumo;
+  fillTalk();
+}
+
+function lastOf(ms, papel) { for (let i = ms.length - 1; i >= 0; i--) if (ms[i].papel === papel && ms[i].texto) return ms[i]; return null; }
+function fillTalk() {
+  if (!D) return;
+  const c = talks.get(D.id);
+  const parts = [];
+  if (D.waiting) parts.push(el("section", { class: "wait-hint" }, el("p", { text: "Este agente aguarda você: responda na faixa âmbar." })));
+  if (D.resumo) parts.push(el("section", { class: "now" }, el("p", { class: "label", text: "Agora" }), el("p", { text: D.resumo })));
+  if (!c || (!c.data && !c.err)) {
+    parts.push(el("p", { class: "soft", text: "A carregar a conversa…" }));
+  } else if (c.err && !c.data) {
+    parts.push(el("p", { class: "soft", text: "Não foi possível ler a conversa: " + c.err + "." }));
+  } else {
+    const ms = c.data.mensagens || [];
+    const u = lastOf(ms, "utilizador"), a = lastOf(ms, "assistente");
+    if (!ms.length) parts.push(el("p", { class: "soft", text: c.data.disponivel ? "A conversa ainda está vazia." : "Este agente não partilha a conversa com o Towerman." }));
+    if (u) parts.push(el("section", {}, el("p", { class: "label", text: ["Último pedido", since(u.em)].filter(Boolean).join(" · ") }), el("p", { text: cut(u.texto, 1200) })));
+    if (a) parts.push(el("section", {}, el("p", { class: "label", text: ["Última resposta", since(a.em)].filter(Boolean).join(" · ") }), el("p", { text: cut(a.texto, 1600) })));
+    const atBottom = D.talk.scrollHeight - D.talk.scrollTop - D.talk.clientHeight < 24;
+    D.talk.replaceChildren(...ms.slice(-12).map((m) => el("p", {}, el("span", { class: "who", text: m.papel }), el("br"), cut(m.texto, 800))));
+    if (!ms.length) D.talk.append(el("p", { class: "soft", text: "Sem mensagens." }));
+    D.summary.textContent = "Conversa recente (" + Math.min(ms.length, 12) + ")";
+    if (atBottom) D.talk.scrollTop = D.talk.scrollHeight;
+  }
+  D.ctx.replaceChildren(...parts);
+}
+
+// ---------- Gestos: arrastar um cartão para os lados (ponteiro, ecrã tátil, trackpad, Shift+setas) ----------
+// Direita = ação principal (Permitir ou Focar); esquerda = a outra (Negar ou Resposta rápida).
+let G = null;          // gesto em curso: { wrap, card, under, acts, kind, dx, thr, w, board }
+let P = null;          // ponteiro em baixo, ainda sem decidir se é arrasto
+let W = null;          // trackpad: { acc, t }
+let boardDirty = false;
+let suppressClickUntil = 0;
+// Um arrasto nunca dispara também o clique do cartão ou do botão por baixo.
+document.addEventListener("click", (e) => {
+  if (performance.now() < suppressClickUntil) { suppressClickUntil = 0; e.stopPropagation(); e.preventDefault(); }
+}, true);
+
+const isHoriz = (dx, dy) => Math.abs(dx) > 1.6 * Math.abs(dy);
+function gBegin(wrap, card, kind) {
+  const w = card.getBoundingClientRect().width || 300;
+  G = { wrap, card, under: wrap.firstChild, acts: wrap._actions() || {}, kind, dx: 0, w,
+    thr: Math.max(40, Math.min(90, w * 0.3)), board: !!wrap.closest("#board") };
+  card.classList.remove("back");
+}
+function gMove(raw) {
+  const a = raw > 0 ? G.acts.right : G.acts.left;
+  const max = G.w * 0.6;
+  let dx = raw;
+  if (!a) dx = Math.sign(raw) * Math.min(Math.abs(raw), 40) * 0.4; // sem ação deste lado: só resiste
+  else if (Math.abs(raw) > max) dx = Math.sign(raw) * (max + (Math.abs(raw) - max) * 0.2);
+  G.dx = dx;
+  G.card.style.transform = dx ? "translateX(" + dx.toFixed(1) + "px)" : "";
+  const u = G.under;
+  if (a && dx) {
+    u.textContent = a.label;
+    u.style.background = a.color;
+    u.className = "under " + (dx > 0 ? "go-right" : "go-left") + (Math.abs(dx) >= G.thr ? " full" : "");
+    u.style.opacity = String(Math.min(1, Math.abs(dx) / G.thr) * 0.5);
+  } else { u.className = "under"; u.style.opacity = "0"; }
+}
+function gEnd(commit) {
+  const g = G;
+  G = null;
+  if (!g) return;
+  if (W) { clearTimeout(W.t); W = null; }
+  document.body.classList.remove("swiping");
+  const a = g.dx > 0 ? g.acts.right : g.acts.left;
+  const fire = commit && a && Math.abs(g.dx) >= g.thr;
+  g.card.classList.add("back");
+  g.card.style.transform = "";
+  g.under.className = "under";
+  g.under.style.opacity = "0";
+  setTimeout(() => g.card.classList.remove("back"), 220);
+  if (fire) a.run(g.wrap);
+  if (boardDirty) drawBoard();
+}
+
+// Envolve um cartão (faixa ou linha) para o tornar arrastável. actions() devolve { right, left },
+// cada um { label, color, run(wrap) } ou null; é lida no início de cada gesto.
+function swipeable(card, actions) {
+  const wrap = el("div", { class: "swipe" });
+  const under = el("div", { class: "under", "aria-hidden": "true" });
+  card.classList.add("card");
+  wrap.append(under, card);
+  wrap._actions = actions;
+  const a0 = actions() || {};
+  const tip = [a0.right && "Arraste para a direita ou Shift+→: " + a0.right.label, a0.left && "para a esquerda ou Shift+←: " + a0.left.label].filter(Boolean).join(" · ");
+  if (tip) { card.title = tip; card.setAttribute("aria-keyshortcuts", "Shift+ArrowRight Shift+ArrowLeft"); }
+
+  wrap.addEventListener("dragstart", (e) => { if (P) e.preventDefault(); });
+  wrap.addEventListener("pointerdown", (e) => {
+    if (G || P || !e.isPrimary || (e.pointerType === "mouse" && e.button !== 0)) return;
+    if (e.target.closest("textarea, input, select, [contenteditable]")) return;
+    if (e.pointerType === "mouse" && e.target.closest(".cmd")) return; // o comando continua selecionável com o rato
+    P = { id: e.pointerId, x: e.clientX, y: e.clientY, wrap, on: false };
+  });
+  wrap.addEventListener("pointermove", (e) => {
+    if (!P || P.id !== e.pointerId || P.wrap !== wrap) return;
+    const dx = e.clientX - P.x, dy = e.clientY - P.y;
+    if (!P.on) {
+      if (Math.abs(dx) < 12 && Math.abs(dy) < 12) return;
+      if (G || !isHoriz(dx, dy)) { P = null; return; } // vertical: é scroll, não gesto
+      P.on = true;
+      gBegin(wrap, card, "pointer");
+      try { wrap.setPointerCapture(e.pointerId); } catch (_) { /* sem captura, segue na mesma */ }
+      document.body.classList.add("swiping");
+    }
+    if (!G || G.wrap !== wrap) return;
+    e.preventDefault();
+    const sel = window.getSelection && window.getSelection();
+    if (sel && !sel.isCollapsed) sel.removeAllRanges();
+    gMove(dx);
+  });
+  const up = (commit) => (e) => {
+    if (!P || P.id !== e.pointerId || P.wrap !== wrap) return;
+    const on = P.on;
+    P = null;
+    if (!on) return;
+    suppressClickUntil = performance.now() + 600;
+    if (G && G.wrap === wrap) gEnd(commit);
+  };
+  wrap.addEventListener("pointerup", up(true));
+  wrap.addEventListener("pointercancel", up(false));
+  // No toque, o Chrome captura o ponteiro no filho tocado; essa captura implícita perde-se (e o evento
+  // borbulha) quando o invólucro a pede. Só conta a perda da captura do próprio invólucro.
+  wrap.addEventListener("lostpointercapture", (e) => {
+    if (e.target === wrap && P && P.on && P.id === e.pointerId && P.wrap === wrap) { P = null; suppressClickUntil = performance.now() + 600; if (G && G.wrap === wrap) gEnd(false); }
+  });
+
+  // Trackpad de dois dedos: deltaX acumulado; os dedos para a esquerda dão deltaX positivo
+  // e o cartão vai para a esquerda com eles. O gesto acaba após 150 ms sem eventos.
+  wrap.addEventListener("wheel", (e) => {
+    const k = e.deltaMode === 1 ? 16 : e.deltaMode === 2 ? (card.clientWidth || 300) : 1;
+    const dx = e.deltaX * k, dy = e.deltaY * k;
+    if (G && G.wrap !== wrap) return;
+    if (P && P.on) return;
+    if (!isHoriz(dx, dy) || dx === 0) return; // só o horizontal é nosso; o resto é scroll normal
+    e.preventDefault();
+    if (!G) { gBegin(wrap, card, "wheel"); W = { acc: 0, t: 0 }; }
+    if (!W) return;
+    W.acc -= dx;
+    gMove(W.acc);
+    clearTimeout(W.t);
+    W.t = setTimeout(() => { if (G && G.wrap === wrap && G.kind === "wheel") gEnd(true); }, 150);
+  }, { passive: false });
+
+  // Teclado: Shift+→ e Shift+← no cartão focado (as setas sozinhas ficam para o scroll).
+  wrap.addEventListener("keydown", (e) => {
+    if (!e.shiftKey || e.altKey || e.ctrlKey || e.metaKey) return;
+    if (e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
+    if (e.target.closest("textarea, input, select, [contenteditable]")) return;
+    const a = (wrap._actions() || {})[e.key === "ArrowRight" ? "right" : "left"];
+    if (!a) return;
+    e.preventDefault();
+    a.run(wrap);
+  });
+  return wrap;
+}
+
+// Nota que aparece como aviso (toast): para as linhas, que não têm caixa de nota própria.
+// Mensagens a meio ("A procurar…") não aparecem; só o resultado.
+function toastNote() {
+  return { set textContent(v) { if (v && !/…$/.test(v)) toast(v); } };
+}
+
+// ---------- Fim da última resposta do agente (cartões e Resposta rápida) ----------
+function tailOf(id, n, flat) {
+  const c = talks.get(id);
+  if (!c || !c.data) return "";
+  const a = lastOf(c.data.mensagens || [], "assistente");
+  if (!a) return "";
+  let t = String(a.texto).trim();
+  if (flat) t = t.replace(/\s+/g, " ");
+  return t.length > n ? "…" + t.slice(-(n - 1)).trimStart() : t;
+}
+// Só para linhas visíveis, no máximo um pedido por sessão a cada 10 s e três ao mesmo tempo.
+let tailFlight = 0;
+const tailSeen = typeof IntersectionObserver === "function" ? new IntersectionObserver((es) => {
+  for (const e of es) if (e.isIntersecting) wantTail(e.target.dataset.id);
+}) : null;
+function wantTail(id) {
+  const c = talks.get(id);
+  if (!id || tailFlight >= 3 || (c && (c.busy || (c.at && Date.now() - c.at < 10000)))) return;
+  tailFlight++;
+  fetchTalk(id, true).finally(() => { tailFlight--; });
+}
+function paintTail(id) {
+  for (const r of $("board").querySelectorAll(".row")) {
+    if (r.dataset.id !== id) continue;
+    const t = r.querySelector(".tail");
+    if (t) t.textContent = tailOf(id, 140, true);
+  }
+  if (Q.node && Q.id === id && Q.tail) fillQuickTail();
+}
+
+// ---------- Resposta rápida: frases prontas num menu junto ao cartão ----------
+const QUICK_KEY = "towerman.respostasRapidas";
+const QUICK_DEFAULT = ["Continua", "Sim, avança", "Faz commit", "Explica melhor"];
+function loadPhrases() {
+  try {
+    const v = JSON.parse(localStorage.getItem(QUICK_KEY) || "null");
+    if (Array.isArray(v)) {
+      const l = v.filter((x) => typeof x === "string").map((x) => x.trim()).filter(Boolean);
+      if (l.length) return l;
+    }
+  } catch (_) { /* sem localStorage ou valor estragado: lista por omissão */ }
+  return QUICK_DEFAULT.slice();
+}
+function savePhrases(list) {
+  try {
+    if (list.length) localStorage.setItem(QUICK_KEY, JSON.stringify(list));
+    else localStorage.removeItem(QUICK_KEY);
+    return true;
+  } catch (_) { return false; }
+}
+// Só sessões vivas (não terminadas) recebem Resposta rápida.
+function quickAction(id) {
+  const s = sessions.find((x) => x.id === id);
+  if (!s || s.estado === "terminada") return null;
+  return { label: "Resposta rápida", color: "var(--blue)", run: (wrap) => openQuick(id, wrap) };
+}
+
+const Q = { id: null, node: null, anchor: null, tail: null };
+function openQuick(id, anchor) {
+  closeQuick();
+  const s = sessions.find((x) => x.id === id);
+  if (!s || s.estado === "terminada") return;
+  const box = el("div", { id: "quick", role: "dialog", "aria-label": "Resposta rápida para " + name(s) });
+  box.addEventListener("keydown", (e) => { if (e.key === "Escape") { e.stopPropagation(); e.preventDefault(); closeQuick(true); } });
+  Object.assign(Q, { id, node: box, anchor, tail: null });
+  document.body.append(box);
+  quickMenu();
+  const c = talks.get(id);
+  if (!c || (!c.busy && (!c.at || Date.now() - c.at > 10000))) fetchTalk(id, true);
+}
+function closeQuick(restore) {
+  if (!Q.node) return;
+  const had = Q.node.contains(document.activeElement);
+  Q.node.remove();
+  const id = Q.id, a = Q.anchor;
+  Object.assign(Q, { id: null, node: null, anchor: null, tail: null });
+  if (restore || had) {
+    let card = a && a.isConnected ? a.querySelector(".card") : null;
+    if (!card) card = [...$("board").querySelectorAll(".row")].find((r) => r.dataset.id === id) || null;
+    if (card) card.focus({ preventScroll: true });
+  }
+}
+function placeQuick() {
+  const b = Q.node;
+  if (!b) return;
+  const a = Q.anchor && Q.anchor.isConnected ? Q.anchor.getBoundingClientRect() : null;
+  const bw = b.offsetWidth, bh = b.offsetHeight;
+  let top, left;
+  if (a) {
+    top = a.bottom + 6;
+    if (top + bh > innerHeight - 8 && a.top - bh - 6 > 8) top = a.top - bh - 6;
+    left = a.right - bw;
+  } else { top = (innerHeight - bh) / 2; left = (innerWidth - bw) / 2; }
+  top = Math.max(8, Math.min(top, Math.max(8, innerHeight - bh - 8)));
+  left = Math.max(12, Math.min(left, innerWidth - bw - 12));
+  b.style.top = (top + scrollY) + "px";
+  b.style.left = (left + scrollX) + "px";
+}
+function fillQuickTail() {
+  const c = talks.get(Q.id);
+  const t = tailOf(Q.id, 200, false);
+  Q.tail.textContent = t || (c && (c.busy || !c.at) ? "A carregar a última resposta…" : "");
+  if (!c) Q.tail.textContent = "A carregar a última resposta…";
+}
+function quickMenu() {
+  const s = sessions.find((x) => x.id === Q.id);
+  if (!s) { closeQuick(); return; }
+  const btn = (text, cls, fn) => { const b = el("button", { type: "button", class: cls || "", text }); b.onclick = fn; return b; };
+  Q.tail = el("p", { class: "q-tail", "aria-label": "Fim da última resposta do agente" });
+  fillQuickTail();
+  const list = el("div", { class: "q-list" }, ...loadPhrases().map((f) => btn(f, "phrase", () => sendQuick(s, f))));
+  const id = Q.id;
+  Q.node.replaceChildren(el("p", { class: "q-h", text: "Resposta rápida · " + name(s) }), Q.tail, list,
+    el("div", { class: "q-row" },
+      btn("Escrever…", "", () => { closeQuick(); writeTo(id); }),
+      btn("Editar frases…", "", quickEditor),
+      btn("Cancelar", "", () => closeQuick(true))));
+  placeQuick();
+  const first = list.querySelector("button");
+  if (first) first.focus({ preventScroll: true });
+}
+function quickEditor() {
+  const ta = el("textarea", { "aria-label": "Frases da Resposta rápida, uma por linha" });
+  ta.value = loadPhrases().join("\n");
+  const save = () => {
+    const l = ta.value.split("\n").map((x) => x.trim()).filter(Boolean);
+    if (!savePhrases(l)) toast("Não foi possível guardar as frases neste navegador.");
+    quickMenu();
+  };
+  const b = (text, fn) => { const x = el("button", { type: "button", text }); x.onclick = fn; return x; };
+  Q.tail = null;
+  Q.node.replaceChildren(el("p", { class: "q-h", text: "Editar frases (uma por linha)" }), ta,
+    el("div", { class: "q-row" }, b("Guardar", save), b("Repor", () => { ta.value = QUICK_DEFAULT.join("\n"); }), b("Voltar", quickMenu)));
+  ta.onkeydown = (e) => { if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) { e.preventDefault(); save(); } };
+  placeQuick();
+  ta.focus();
+}
+// Mesmo caminho do campo «Enviar»: POST /v1/sessoes/{id}/mensagens com { texto }.
+async function sendQuick(s, texto) {
+  closeQuick(true);
+  let msg;
+  try {
+    const m = await post("/v1/sessoes/" + encodeURIComponent(s.id) + "/mensagens", { texto });
+    msg = m.estado === "entregue" ? "Entregue no terminal." : "Na fila: " + (m.motivo || "entra quando o passo atual terminar") + ".";
+    toast("«" + cut(texto, 40) + "» → " + name(s) + ": " + msg);
+  } catch (e) {
+    msg = "Não foi possível enviar: " + e.message + ".";
+    toast(name(s) + ": " + msg);
+  }
+  notes.set(s.id, msg);
+}
+// «Escrever…»: abre o painel do agente com o campo de texto focado.
+function writeTo(id) {
+  select(id, true);
+  requestAnimationFrame(() => { const ta = $("detail").querySelector(".reply textarea"); if (ta) ta.focus(); });
+}
+// Clique fora do menu fecha-o.
+document.addEventListener("pointerdown", (e) => { if (Q.node && !Q.node.contains(e.target)) closeQuick(); }, true);
+window.addEventListener("resize", () => placeQuick());
+
+// ---------- Pareamento: QR num diálogo, com «Voltar ao deck» e fecho automático ao parear ----------
+const pair = { known: null, poll: 0, tick: 0, exp: 0, done: false };
+function openPair() {
+  const d = $("pair");
+  pair.known = null; pair.done = false;
+  $("pair-st").className = "pair-st"; $("pair-st").textContent = "";
+  if (!d.open) d.showModal();
+  newCode();
+  listDevices();
+  clearInterval(pair.poll);
+  pair.poll = setInterval(listDevices, 2500);
+  $("pair-back").focus();
+}
+function closePair() {
+  const d = $("pair");
+  if (d.open) d.close();
+}
+function stopPair() {
+  clearInterval(pair.poll); clearInterval(pair.tick);
+  pair.poll = pair.tick = 0;
+}
+function newCode() {
+  const img = $("pair-img"), msg = $("qr-msg"), box = $("qr-box"), st = $("pair-st");
+  clearInterval(pair.tick);
+  box.classList.add("off");
+  msg.textContent = "A gerar o código…";
+  st.className = "pair-st"; st.textContent = "";
+  const url = "/v1/pareamento/qr.png?t=" + Date.now();
+  img.onload = () => {
+    box.classList.remove("off"); msg.textContent = "";
+    pair.exp = Date.now() + 120000;
+    const upd = () => {
+      if (pair.done) return;
+      const left = Math.max(0, Math.round((pair.exp - Date.now()) / 1000));
+      if (left === 0) {
+        clearInterval(pair.tick);
+        box.classList.add("off"); msg.textContent = "Código expirado.";
+        st.className = "pair-st"; st.textContent = "Carregue em «Gerar outro código».";
+        $("pair-new").focus();
+        return;
+      }
+      st.textContent = "À espera do iPhone… o código vale " + Math.floor(left / 60) + ":" + String(left % 60).padStart(2, "0") + " e só serve uma vez.";
+    };
+    upd();
+    pair.tick = setInterval(upd, 1000);
+  };
+  img.onerror = async () => {
+    msg.textContent = "Sem código.";
+    let why = "o serviço não respondeu";
+    try {
+      const r = await fetch(url, { credentials: "same-origin", cache: "no-store" });
+      const t = (await r.text()).trim();
+      if (r.status === 401) why = "a sessão do painel expirou; abra o deck de novo";
+      else if (r.status === 409) why = "a porta de rede está desligada (TOWERMAN_PORTA_REDE=0); ligue-a e reinicie o serviço";
+      else if (t) why = t;
+    } catch (e) { /* fica a mensagem genérica */ }
+    st.className = "pair-st err"; st.textContent = "Não foi possível gerar o código: " + why + ".";
+  };
+  img.src = url;
+}
+async function listDevices() {
+  const ul = $("pair-list");
+  let list;
+  try { list = await get("/v1/aparelhos"); } catch (e) {
+    if (!ul.querySelector("li:not(.empty)")) ul.replaceChildren(el("li", { class: "empty", text: "Não foi possível ler os aparelhos: " + e.message + "." }));
+    return;
+  }
+  list = Array.isArray(list) ? list : [];
+  const ids = new Set(list.map((a) => a.id));
+  let fresh = null;
+  if (pair.known === null) pair.known = ids;
+  else { fresh = list.find((a) => !pair.known.has(a.id)) || null; for (const id of ids) pair.known.add(id); }
+  ul.replaceChildren(...(list.length ? list.slice().reverse().map((a) => {
+    const rev = el("button", { type: "button", class: "btn", text: "Revogar" });
+    rev.onclick = async () => {
+      if (!confirm("Revogar «" + (a.nome || a.id) + "»? Este aparelho deixa de ver e de responder aos agentes.")) return;
+      rev.disabled = true;
+      try { await post("/v1/aparelhos/" + encodeURIComponent(a.id) + "/revogar"); listDevices(); }
+      catch (e) { rev.disabled = false; alert("Não foi possível revogar: " + e.message + "."); }
+    };
+    const seen = a.visto_em ? "visto há " + since(a.visto_em) : "ainda não ligou";
+    return el("li", { class: fresh && fresh.id === a.id ? "novo" : "" }, el("div", {}, el("b", { text: a.nome || "iPhone" }),
+      el("small", { text: "pareado em " + (a.criado_em ? new Date(a.criado_em).toLocaleDateString("pt-BR") : "?") + " · " + seen })), rev);
+  }) : [el("li", { class: "empty", text: "Nenhum aparelho pareado ainda." })]));
+  if (fresh && !pair.done && $("pair").open) {
+    pair.done = true;
+    clearInterval(pair.tick);
+    $("qr-box").classList.add("off"); $("qr-msg").textContent = "✓";
+    const st = $("pair-st");
+    st.className = "pair-st ok"; st.textContent = "Pareado: " + (fresh.nome || "iPhone") + ". A voltar ao deck…";
+    setTimeout(() => { if (pair.done) { closePair(); toast("iPhone pareado: " + (fresh.nome || "iPhone") + "."); } }, 2500);
+  }
+}
+$("open-pair").onclick = openPair;
+$("pair-back").onclick = closePair;
+$("pair-new").onclick = () => { pair.done = false; newCode(); };
+$("pair").addEventListener("close", () => { stopPair(); pair.done = false; $("open-pair").focus(); });
+// Clique no fundo escuro (fora da caixa) também volta ao deck.
+$("pair").addEventListener("click", (e) => {
+  if (e.target !== $("pair")) return;
+  const b = $("pair").getBoundingClientRect();
+  if (e.clientX < b.left || e.clientX > b.right || e.clientY < b.top || e.clientY > b.bottom) closePair();
+});
+
+// Esc fecha o agente aberto (o diálogo trata do seu próprio Esc).
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape" && Q.node) { closeQuick(); return; }
+  if (e.key === "Escape" && !$("pair").open && selected && !(e.target && e.target.tagName === "TEXTAREA")) { selected = null; render(); }
+});
+
+// Ao vivo: o serviço avisa cada mudança; esta página faz os pedidos esperarem pela decisão aqui.
+function live() {
+  const es = new EventSource("/v1/ao-vivo");
+  es.addEventListener("mudou", () => { load(); if (selected) fetchTalk(selected, false); });
+  es.onopen = () => { $("live").style.color = "var(--green)"; load(); };
+  es.onerror = () => { $("live").style.color = "var(--red)"; };
+}
+get("/v1/painel").then(() => post("/v1/painel", { responder_permissoes: true })).catch(() => {});
+$("host").textContent = location.hostname === "127.0.0.1" || location.hostname === "localhost" ? "este computador" : location.hostname;
+if (location.hash === "#parear") { history.replaceState(null, "", location.pathname); openPair(); }
+load();
+live();
+setInterval(() => { if (!document.hidden) render(); }, 30000);
+let resizeT = 0, lastCompact = null;
+window.addEventListener("resize", () => {
+  clearTimeout(resizeT);
+  resizeT = setTimeout(() => { const c = $("radar").clientWidth < 480; if (c !== lastCompact) { lastCompact = c; drawRadar(); } }, 150);
+});
+</script>
+</body>
+</html>

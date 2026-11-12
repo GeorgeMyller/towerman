@@ -1,0 +1,15 @@
+# Apple / Xcode
+.DS_Store
+*.xcuserstate
+xcuserdata/
+DerivedData/
+build/
+
+# Impeccable: capturas de revisão (geradas)
+.impeccable/review/
+
+# DMG gerado por tools/dmg.sh
+dist/
+
+# Equipa e IDs da Apple de quem compila (ver Config/Local.xcconfig.example)
+Config/Local.xcconfig

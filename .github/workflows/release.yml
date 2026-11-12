@@ -1,0 +1,118 @@
+name: release
+
+# Publica a release de uma tag já criada pelo tools/deploy.sh: binários do servidor (Linux, macOS,
+# Windows), o DMG do app do Mac e o SHA256SUMS. Corre por disparo (o push neste repo não dispara
+# workflows). Com publicar=false só compila, para testar o workflow sem criar a release.
+# Repo privado: tudo no Mac mini (o Pi fica de reserva). Repo público:
+# runners do GitHub, que lá são gratuitos.
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Tag a publicar (ex.: v0.8.0-rc.3)"
+        required: true
+      publicar:
+        description: "Criar a release no GitHub"
+        type: boolean
+        default: true
+
+permissions:
+  contents: write
+
+jobs:
+  # As 6 plataformas num só job no Mac mini: no Pi eram 6 jobs em série, cerca de 20 min.
+  binarios:
+    runs-on: ${{ fromJSON('"ubuntu-latest"') }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag }}
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - name: build
+        env:
+          CGO_ENABLED: "0"
+        run: |
+          for alvo in linux/amd64 linux/arm64 darwin/amd64 darwin/arm64 windows/amd64 windows/arm64; do
+            GOOS=${alvo%/*}; GOARCH=${alvo#*/}
+            ext=""; [ "$GOOS" = windows ] && ext=.exe
+            GOOS=$GOOS GOARCH=$GOARCH go build -trimpath -ldflags="-s -w" -o "dist/towerman-${{ inputs.tag }}-$GOOS-$GOARCH$ext" ./cmd/towerman
+          done
+      - uses: actions/upload-artifact@v4
+        with:
+          name: binarios
+          path: dist/*
+
+  dmg:
+    runs-on: ${{ fromJSON('"macos-latest"') }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag }}
+          # O número de build dos apps é o número de commits.
+          fetch-depth: 0
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - run: command -v xcodegen || brew install xcodegen
+      - name: Xcode mais recente
+        # O projeto usa os SDK mais novos (watchOS 26); a imagem pode trazer outro Xcode por omissão.
+        # No Mac mini fica o Xcode do sistema: trocá-lo pediria sudo.
+        if: runner.environment == 'github-hosted'
+        run: |
+          x=$(ls -d /Applications/Xcode_*.app | sort -V | tail -1)
+          sudo xcode-select -s "$x"
+          xcodebuild -version
+      - name: DMG
+        # Os passos do tools/dmg.sh, aqui no workflow para não dependerem da versão do script na tag.
+        # Sem a conta Apple no runner: assinatura ad hoc, como um app não assinado para o Gatekeeper.
+        run: |
+          versao="${{ inputs.tag }}"; versao="${versao#v}"
+          cd apple
+          xcodegen generate
+          build="$RUNNER_TEMP/towerman-mac"
+          if ! xcodebuild -project Towerman.xcodeproj -scheme TowermanMac -configuration Release \
+              -derivedDataPath "$build" CODE_SIGN_STYLE=Manual DEVELOPMENT_TEAM= CODE_SIGN_IDENTITY=- \
+              build > "$RUNNER_TEMP/xcodebuild.log" 2>&1; then
+            grep -E 'error:|\*\* BUILD' "$RUNNER_TEMP/xcodebuild.log" | head -40
+            exit 1
+          fi
+          app="$build/Build/Products/Release/Towerman.app"
+          test -x "$app/Contents/MacOS/towerman-cli"
+          palco="$RUNNER_TEMP/dmg"; mkdir -p "$palco" dist
+          cp -R "$app" "$palco/"
+          ln -s /Applications "$palco/Applications"
+          hdiutil create -volname Towerman -srcfolder "$palco" -fs HFS+ -format UDZO -ov "dist/Towerman-$versao.dmg"
+      - name: versão do DMG
+        run: |
+          esperado="${{ inputs.tag }}"; esperado="${esperado#v}"
+          ls apple/dist/Towerman-$esperado.dmg
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dmg
+          path: apple/dist/*.dmg
+
+  publicar:
+    needs: [binarios, dmg]
+    runs-on: ${{ fromJSON('"ubuntu-latest"') }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+      - name: SHA256SUMS
+        run: cd dist && shasum -a 256 * > SHA256SUMS && cat SHA256SUMS
+      - name: release
+        if: ${{ inputs.publicar }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ inputs.tag }}
+        run: |
+          pre=""; case "$TAG" in *-rc.*) pre=--prerelease ;; esac
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release upload "$TAG" dist/* --clobber
+          else
+            gh release create "$TAG" dist/* $pre --verify-tag --title "$TAG" --generate-notes
+          fi

@@ -1,0 +1,1335 @@
+<!doctype html>
+<html lang="pt">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Towerman</title>
+<style>
+:root {
+  --fundo: #f6f7f9; --superficie: #ffffff; --borda: #e2e5ea; --texto: #1c2430; --suave: #677385;
+  --ativa: #1f9d55; --espera: #d9730d; --parada: #8a94a6; --terminada: #b4bcc8; --destaque: #2f6fed;
+  --espera-fundo: #fff4e8; --codigo: #eef1f5; --sombra: 0 1px 2px rgba(16,24,40,.06);
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --fundo: #0f1318; --superficie: #171c23; --borda: #27303b; --texto: #e6eaf0; --suave: #93a0b1;
+    --ativa: #3ecf7a; --espera: #f5a14a; --parada: #7d8899; --terminada: #4d5664; --destaque: #6c9cff;
+    --espera-fundo: #2a1f12; --codigo: #212833; --sombra: none;
+  }
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--fundo); color: var(--texto); font: 14px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif; }
+code, .mono { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; font-size: 12.5px; }
+header { position: sticky; top: 0; z-index: 2; display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+  padding: 12px 20px; background: var(--superficie); border-bottom: 1px solid var(--borda); }
+h1 { font-size: 17px; margin: 0; letter-spacing: .2px; }
+.contagens { display: flex; gap: 12px; color: var(--suave); }
+.contagens b { color: var(--texto); }
+.direita { margin-left: auto; display: flex; align-items: center; gap: 14px; color: var(--suave); }
+.vivo { display: inline-flex; align-items: center; gap: 6px; }
+.vivo i { width: 8px; height: 8px; border-radius: 50%; background: var(--terminada); }
+.vivo.ligado i { background: var(--ativa); }
+label { cursor: pointer; user-select: none; }
+main { padding: 16px 20px 40px; max-width: 1400px; margin: 0 auto; }
+.espera-faixa { display: none; margin-bottom: 16px; padding: 10px 14px; border-radius: 8px; background: var(--espera-fundo);
+  border: 1px solid var(--espera); color: var(--texto); }
+.espera-faixa.visivel { display: block; }
+.espera-faixa button { margin: 2px 6px 2px 0; }
+.repo { margin-bottom: 22px; }
+.repo > h2 { font-size: 15px; margin: 0 0 8px; display: flex; gap: 8px; align-items: baseline; }
+.repo > h2 small { color: var(--suave); font-weight: 400; }
+.worktree { margin: 0 0 12px; padding-left: 12px; border-left: 2px solid var(--borda); }
+.worktree > h3 { font-size: 12.5px; font-weight: 500; color: var(--suave); margin: 0 0 8px; }
+.cartoes { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 10px; }
+.cartao { text-align: left; font: inherit; color: inherit; background: var(--superficie); border: 1px solid var(--borda);
+  border-radius: 8px; padding: 10px 12px; box-shadow: var(--sombra); cursor: pointer; display: flex; flex-direction: column; gap: 6px; }
+.cartao:hover, .cartao:focus-visible { border-color: var(--destaque); outline: none; }
+.cartao.a_espera { border-color: var(--espera); background: var(--espera-fundo); }
+.cartao.terminada { opacity: .6; }
+.topo { display: flex; align-items: center; gap: 8px; }
+.ponto { width: 9px; height: 9px; border-radius: 50%; flex: none; }
+.ativa .ponto { background: var(--ativa); }
+.a_espera .ponto { background: var(--espera); animation: pulso 1.4s infinite; }
+.parada .ponto { background: var(--parada); }
+.terminada .ponto { background: var(--terminada); }
+@keyframes pulso { 50% { box-shadow: 0 0 0 5px transparent; opacity: .45; } }
+@media (prefers-reduced-motion: reduce) { .a_espera .ponto { animation: none; } }
+.nome { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.chip { font-size: 11px; padding: 1px 6px; border-radius: 10px; background: var(--codigo); color: var(--suave); }
+.estado { margin-left: auto; font-size: 12px; color: var(--suave); white-space: nowrap; }
+.a_espera .estado { color: var(--espera); font-weight: 600; }
+.branch { color: var(--suave); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.resumo { overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+.toques { margin: 0; padding: 0; list-style: none; color: var(--suave); }
+.toques li { display: flex; gap: 6px; overflow: hidden; white-space: nowrap; }
+.toques li code { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; direction: rtl; text-align: left; }
+.toques li span { flex: none; }
+.vazio { text-align: center; color: var(--suave); padding: 60px 0; }
+.erro { display: none; margin-bottom: 12px; padding: 8px 12px; border-radius: 8px; border: 1px solid var(--espera); color: var(--espera); }
+.erro.visivel { display: block; }
+aside { position: fixed; top: 0; right: 0; bottom: 0; width: min(640px, 100%); background: var(--superficie);
+  border-left: 1px solid var(--borda); transform: translateX(100%); transition: transform .18s ease; z-index: 6;
+  display: flex; flex-direction: column; box-shadow: -12px 0 32px rgba(0,0,0,.12); }
+aside.aberto { transform: none; }
+.lat-cab { position: static; display: block; padding: 14px 18px 10px; border-bottom: 1px solid var(--borda); }
+.lat-linha { display: flex; align-items: center; gap: 10px; }
+.lat-linha h2 { margin: 0; font-size: 17px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.lat-linha .fechar { margin-left: auto; }
+.lat-estado { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; padding: 2px 9px; border-radius: 12px; background: var(--codigo); white-space: nowrap; }
+.lat-estado.ativa { color: var(--ativa); } .lat-estado.a_espera { color: var(--espera); background: var(--espera-fundo); font-weight: 600; }
+.lat-estado.parada { color: var(--parada); } .lat-estado.terminada { color: var(--terminada); }
+.lat-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; font-size: 12px; color: var(--suave); }
+.lat-chips span { background: var(--codigo); border-radius: 10px; padding: 1px 8px; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.lat-acoes { display: flex; gap: 8px; align-items: center; margin-top: 10px; flex-wrap: wrap; }
+.lat-acoes .nota { color: var(--suave); font-size: 12.5px; }
+.lat-alerta { margin-top: 10px; padding: 7px 10px; border-radius: 8px; font-size: 13px; background: var(--espera-fundo); border: 1px solid var(--espera); }
+.lat-alerta.vermelho { border-color: #d64545; background: #d6454514; }
+.lat-abas { display: flex; gap: 2px; padding: 0 12px; border-bottom: 1px solid var(--borda); }
+.lat-abas button { border: 0; border-bottom: 2px solid transparent; border-radius: 0; background: none; padding: 9px 12px; color: var(--suave); }
+.lat-abas button.ativa { color: var(--texto); border-bottom-color: var(--destaque); font-weight: 600; }
+.lat-abas button span { font-size: 11px; background: var(--codigo); border-radius: 8px; padding: 0 6px; margin-left: 4px; }
+.lat-corpo { flex: 1; overflow-y: auto; padding: 14px 18px; scroll-behavior: auto; }
+.lat-rodape { border-top: 1px solid var(--borda); padding: 10px 18px 14px; background: var(--superficie); }
+.lat-rodape textarea { display: block; width: 100%; min-height: 46px; max-height: 180px; resize: vertical; font: inherit; color: inherit;
+  background: var(--fundo); border: 1px solid var(--borda); border-radius: 8px; padding: 8px 10px; }
+.lat-rodape textarea:focus { outline: 2px solid var(--destaque); border-color: transparent; }
+.lat-rodape .linha { display: flex; gap: 8px; align-items: center; justify-content: space-between; color: var(--suave); font-size: 12.5px; margin-top: 6px; }
+.conversa { display: flex; flex-direction: column; gap: 10px; }
+.bolha { max-width: 88%; padding: 8px 12px; border-radius: 12px; overflow-wrap: anywhere; line-height: 1.5; }
+.bolha.utilizador { align-self: flex-end; background: var(--destaque); color: #fff; border-bottom-right-radius: 4px; white-space: pre-wrap; }
+.bolha.assistente { align-self: flex-start; background: var(--fundo); border: 1px solid var(--borda); border-bottom-left-radius: 4px; }
+.bolha .quando { display: block; font-size: 11px; opacity: .7; margin-bottom: 2px; }
+.bolha.cortada .texto { max-height: 13.5em; overflow: hidden; -webkit-mask-image: linear-gradient(#000 70%, transparent); mask-image: linear-gradient(#000 70%, transparent); }
+.bolha .mais { margin-top: 4px; font-size: 12px; padding: 1px 8px; }
+.texto p { margin: 0 0 6px; } .texto p:last-child { margin-bottom: 0; }
+.texto h1, .texto h2, .texto h3, .texto h4 { font-size: 14px; margin: 8px 0 4px; }
+.texto ul, .texto ol { margin: 4px 0 6px; padding-left: 20px; }
+.texto code { background: var(--codigo); border-radius: 4px; padding: 0 4px; font-size: 12px; }
+.texto pre { background: var(--codigo); border-radius: 6px; padding: 8px; overflow-x: auto; font-size: 12px; margin: 6px 0; }
+.texto pre code { background: none; padding: 0; }
+.texto table { border-collapse: collapse; margin: 6px 0; font-size: 12.5px; display: block; overflow-x: auto; }
+.texto th, .texto td { border: 1px solid var(--borda); padding: 3px 7px; text-align: left; }
+.texto blockquote { margin: 4px 0; padding-left: 10px; border-left: 3px solid var(--borda); color: var(--suave); }
+details.ferramentas { align-self: stretch; font-size: 12.5px; color: var(--suave); }
+details.ferramentas summary { cursor: pointer; list-style: none; padding: 3px 8px; border-radius: 6px; }
+details.ferramentas summary::-webkit-details-marker { display: none; }
+details.ferramentas summary:hover { background: var(--codigo); }
+details.ferramentas ol { margin: 4px 0 2px 12px; padding: 0 0 0 14px; }
+details.ferramentas li { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ferr { display: inline-block; font-size: 11px; padding: 0 6px; border-radius: 6px; background: var(--codigo); color: var(--texto); margin-right: 4px; font-family: system-ui, sans-serif; }
+.lista-ficheiros { list-style: none; margin: 0; padding: 0; }
+.lista-ficheiros li { display: flex; gap: 8px; align-items: baseline; padding: 6px 0; border-bottom: 1px solid var(--borda); }
+.lista-ficheiros code { flex: 1; overflow-wrap: anywhere; }
+.lista-ficheiros small { color: var(--suave); white-space: nowrap; }
+.mensagem { padding: 8px 10px; border-left: 3px solid var(--borda); margin: 0 0 8px; white-space: pre-wrap; overflow-wrap: anywhere; background: var(--fundo); border-radius: 0 6px 6px 0; }
+.mensagem.entregue { border-color: var(--ativa); }
+.mensagem.pendente { border-color: var(--espera); }
+.mensagem.falhada { border-color: #d64545; }
+.mensagem small { display: block; color: var(--suave); margin-top: 4px; }
+.lat-vazio { color: var(--suave); text-align: center; padding: 30px 0; }
+
+/* v0.5: orquestração */
+.m-tela svg path.fluxo { stroke: var(--destaque); stroke-width: 2.6; opacity: .9; }
+.m-tela svg path.fluxo.parado { opacity: .35; stroke-dasharray: 2 4; }
+.no .papel { font-size: 10.5px; padding: 0 6px; border-radius: 8px; background: var(--destaque); color: #fff; }
+.no .eng { font-size: 11px; color: var(--suave); }
+.no.origem { outline: 3px solid var(--destaque); outline-offset: 2px; }
+.m-janela.ligando .no { cursor: crosshair; }
+.m-aviso-ligar { display: none; margin-bottom: 8px; padding: 7px 10px; border-radius: 8px; border: 1px dashed var(--destaque); color: var(--destaque); font-size: 13px; }
+.m-aviso-ligar.visivel { display: block; }
+.m-barra .principal { background: var(--destaque); border-color: var(--destaque); color: #fff; }
+dialog { border: 1px solid var(--borda); border-radius: 12px; padding: 0; width: min(560px, calc(100% - 32px)); background: var(--superficie); color: var(--texto); box-shadow: 0 20px 60px rgba(0,0,0,.3); }
+dialog::backdrop { background: rgba(0,0,0,.35); }
+dialog form { display: grid; gap: 12px; padding: 18px 20px; }
+dialog h3 { margin: 0; font-size: 16px; }
+dialog label.campo { display: grid; gap: 4px; font-size: 13px; color: var(--suave); }
+dialog label.campo[hidden] { display: none; }
+.met-barra { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; color: var(--suave); }
+.met-area { margin: 0 0 18px; }
+.met-area h3 { font-size: 13px; margin: 0 0 6px; }
+.met-area td.valor { font-variant-numeric: tabular-nums; font-weight: 600; }
+.met-area td small { display: block; color: var(--espera); font-weight: 400; }
+.met-nota { color: var(--suave); font-size: 12px; }
+dialog input, dialog select, dialog textarea { font: inherit; color: var(--texto); background: var(--fundo); border: 1px solid var(--borda); border-radius: 6px; padding: 6px 8px; width: 100%; }
+dialog textarea { min-height: 90px; resize: vertical; }
+dialog .botoes { display: flex; gap: 8px; justify-content: flex-end; align-items: center; }
+dialog .botoes .nota { margin-right: auto; color: var(--suave); font-size: 12.5px; }
+dialog .ajuda { font-size: 12px; color: var(--suave); margin: -6px 0 0; }
+.fluxo-cartao { background: var(--superficie); border: 1px solid var(--borda); border-radius: 10px; padding: 12px 14px; margin-bottom: 12px; }
+.fluxo-cartao header { position: static; display: flex; gap: 10px; align-items: center; padding: 0; border: 0; background: none; flex-wrap: wrap; }
+.fluxo-cartao h3 { margin: 0; font-size: 15px; }
+.fluxo-estado { font-size: 12px; padding: 1px 8px; border-radius: 10px; background: var(--codigo); }
+.fluxo-estado.ativo { color: var(--ativa); } .fluxo-estado.limite { color: var(--espera); } .fluxo-estado.parado { color: var(--suave); }
+.fluxo-cartao .acoes-fluxo { margin-left: auto; display: flex; gap: 6px; }
+.arestas-lista { margin: 10px 0; display: grid; gap: 6px; }
+.aresta-linha { display: flex; gap: 8px; align-items: center; font-size: 13px; flex-wrap: wrap; }
+.aresta-linha .seta-fluxo { color: var(--destaque); font-weight: 700; }
+.aresta-linha small { color: var(--suave); }
+.linha-tempo { border-left: 2px solid var(--borda); margin-left: 6px; padding-left: 14px; display: grid; gap: 8px; }
+.passagem { position: relative; font-size: 13px; }
+.passagem::before { content: ""; position: absolute; left: -20px; top: 5px; width: 10px; height: 10px; border-radius: 50%; background: var(--destaque); }
+.passagem.falhada::before { background: #d64545; } .passagem.pendente::before { background: var(--espera); }
+.passagem small { color: var(--suave); }
+.passagem details summary { cursor: pointer; color: var(--suave); font-size: 12px; }
+.passagem pre { white-space: pre-wrap; background: var(--codigo); padding: 8px; border-radius: 6px; font-size: 12px; max-height: 240px; overflow: auto; }
+button.fechar { margin-left: auto; }
+.permissoes { display: grid; gap: 8px; margin-bottom: 16px; }
+.permissao { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; padding: 10px 14px; border-radius: 8px;
+  border: 1px solid var(--espera); background: var(--espera-fundo); }
+.permissao code { flex: 1 1 260px; min-width: 0; overflow-wrap: anywhere; }
+button.sim { background: var(--ativa); border-color: var(--ativa); color: #fff; }
+button.nao { border-color: var(--espera); }
+.ide { font-size: 12.5px; }
+select { font: inherit; color: inherit; background: var(--codigo); border: 1px solid var(--borda); border-radius: 6px; padding: 2px 4px; }
+.colisao { font-size: 12px; color: var(--espera); }
+.colisao.mesma { color: #d64545; font-weight: 600; }
+.cartao.colide { box-shadow: inset 3px 0 0 var(--espera); }
+.cartao.colide-mesma { box-shadow: inset 3px 0 0 #d64545; }
+nav.abas { display: flex; gap: 6px; margin-bottom: 14px; }
+nav.abas button.ativa { background: var(--destaque); border-color: var(--destaque); color: #fff; }
+table { width: 100%; border-collapse: collapse; background: var(--superficie); border: 1px solid var(--borda); border-radius: 8px; overflow: hidden; }
+th, td { text-align: left; padding: 6px 10px; border-bottom: 1px solid var(--borda); vertical-align: top; }
+th { font-size: 12px; color: var(--suave); font-weight: 500; }
+td.estado-wt { white-space: nowrap; }
+td.e-ativa { color: var(--ativa); } td.e-suja { color: var(--espera); } td.e-integrada { color: var(--destaque); } td.e-parada, td.e-órfã { color: var(--suave); }
+.aviso-linha { padding: 8px 12px; border: 1px solid var(--borda); border-radius: 8px; background: var(--superficie); margin-bottom: 8px; }
+.aviso-linha.falso { opacity: .55; }
+.aviso-linha small { color: var(--suave); display: block; margin-top: 4px; }
+.tabela-rolagem { overflow-x: auto; }
+
+/* Mapa */
+.m-barra { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 10px; }
+.m-barra input[type=search] { flex: 1 1 260px; font: inherit; color: inherit; background: var(--superficie); border: 1px solid var(--borda); border-radius: 6px; padding: 5px 9px; }
+.m-barra .chip-filtro { border-radius: 14px; padding: 3px 10px; }
+.m-barra .chip-filtro[aria-pressed=true] { background: var(--destaque); border-color: var(--destaque); color: #fff; }
+.m-barra .zoom { display: inline-flex; align-items: center; gap: 4px; margin-left: auto; }
+.m-barra .zoom span { min-width: 44px; text-align: center; color: var(--suave); font-variant-numeric: tabular-nums; }
+.m-resumo { color: var(--suave); margin-bottom: 10px; font-size: 13px; }
+.m-resumo b { color: var(--texto); }
+.m-janela { position: relative; overflow: hidden; border: 1px solid var(--borda); border-radius: 10px; background:
+  radial-gradient(circle, var(--borda) 1px, transparent 1px) 0 0 / 22px 22px, var(--fundo); height: calc(100vh - 210px); min-height: 420px; cursor: grab; touch-action: none; }
+.m-janela.arrastar { cursor: grabbing; }
+.m-tela { position: absolute; left: 0; top: 0; transform-origin: 0 0; padding: 18px; display: grid; grid-template-columns: repeat(auto-fill, minmax(440px, 1fr)); gap: 18px; align-items: start; width: 1400px; }
+.m-tela svg { position: absolute; left: 0; top: 0; pointer-events: none; overflow: visible; z-index: 4; }
+.m-tela svg path { fill: none; stroke-width: 2.2; opacity: .8; stroke-linecap: round; }
+.m-tela svg path.mesma { stroke: #d64545; stroke-dasharray: none; }
+.m-tela svg path.outra { stroke: var(--espera); stroke-dasharray: 6 4; }
+.m-tela svg path.apagada { opacity: .12; }
+.m-tela svg path.foco { opacity: 1; stroke-width: 3.2; }
+.zona { background: var(--superficie); border: 1px solid var(--borda); border-radius: 10px; box-shadow: var(--sombra); cursor: default; position: relative; z-index: 1; }
+.zona.alvo { outline: 2px dashed var(--destaque); }
+.zona > header { position: static; display: flex; gap: 8px; align-items: center; padding: 8px 12px; border-bottom: 1px solid var(--borda); cursor: grab; background: transparent; }
+.zona > header .seta { width: 16px; color: var(--suave); background: none; border: 0; padding: 0; cursor: pointer; }
+.zona > header h3 { margin: 0; font-size: 14px; }
+.zona > header .meta-zona { color: var(--suave); font-size: 12px; margin-left: auto; display: flex; gap: 8px; }
+.zona.recolhida .faixas { display: none; }
+.m-tela > .vazio { grid-column: 1 / -1; }
+.zona .alerta-remotas { margin: 8px 12px 0; font-size: 12px; color: var(--espera); }
+.faixas { padding: 6px 0; }
+.faixa { display: grid; grid-template-columns: 170px 1fr; gap: 10px; padding: 6px 12px; align-items: start; border-left: 3px solid transparent; }
+.faixa:hover { background: var(--codigo); }
+.faixa.e-ativa { border-left-color: var(--ativa); } .faixa.e-suja { border-left-color: var(--espera); }
+.faixa.e-integrada { border-left-color: var(--destaque); } .faixa.e-parada, .faixa.e-órfã { border-left-color: var(--terminada); }
+.faixa.e-base { border-left-color: var(--texto); }
+.trilho { min-width: 0; }
+.trilho .br { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: block; }
+.trilho .info { font-size: 11.5px; color: var(--suave); display: flex; gap: 6px; flex-wrap: wrap; }
+.etiqueta { font-size: 10.5px; padding: 0 6px; border-radius: 8px; background: var(--codigo); color: var(--suave); text-transform: uppercase; letter-spacing: .3px; }
+.nos { display: flex; flex-wrap: wrap; gap: 6px; min-height: 26px; align-items: center; }
+.nos .vazio-faixa { color: var(--suave); font-size: 12px; font-style: italic; }
+.no { display: inline-flex; align-items: center; gap: 6px; max-width: 100%; padding: 4px 10px 4px 8px; border-radius: 16px; border: 1px solid var(--borda);
+  background: var(--superficie); font: inherit; font-size: 12.5px; color: inherit; cursor: pointer; position: relative; z-index: 3; }
+.no:hover, .no:focus-visible { border-color: var(--destaque); outline: none; }
+.no .nome { max-width: 170px; }
+.no small { color: var(--suave); }
+.no .marca { color: var(--ativa); }
+.no.a_espera .marca { color: var(--espera); } .no.parada .marca { color: var(--parada); } .no.terminada .marca { color: var(--terminada); }
+.no.a_espera { border-color: var(--espera); background: var(--espera-fundo); }
+.no.terminada { opacity: .5; }
+.no.colide-mesma { box-shadow: 0 0 0 2px #d6454555; }
+.m-legenda { display: flex; gap: 14px; flex-wrap: wrap; color: var(--suave); font-size: 12px; margin-top: 8px; }
+.m-legenda i { display: inline-block; width: 18px; height: 0; border-top: 2px solid; vertical-align: middle; margin-right: 4px; }
+.m-dica { position: fixed; z-index: 5; max-width: 340px; padding: 8px 10px; border-radius: 8px; background: var(--superficie); border: 1px solid var(--borda);
+  box-shadow: 0 6px 20px rgba(0,0,0,.18); font-size: 12.5px; pointer-events: none; display: none; }
+.m-dica.visivel { display: block; }
+.m-dica code { display: block; color: var(--suave); }
+button { font: inherit; color: inherit; background: var(--codigo); border: 1px solid var(--borda); border-radius: 6px; padding: 3px 9px; cursor: pointer; }
+@media (max-width: 600px) { header, main { padding-left: 16px; padding-right: 16px; } .cartoes { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<header>
+  <h1>Towerman</h1>
+  <div class="contagens" id="contagens"></div>
+  <div class="direita">
+    <span class="ide" id="ide"></span>
+    <label title="O que fazer quando uma sessão vai editar um ficheiro que outra sessão viva alterou na mesma branch nas últimas 24 h. «Pede confirmação»: o Claude Code pergunta-te antes de editar. «Recusa»: a edição é bloqueada e o agente é instruído a falar com a outra sessão. «Não faz nada»: desliga.">Edição em conflito
+      <select id="regra2"><option value="ask">pede confirmação</option><option value="deny">recusa</option><option value="off">não faz nada</option></select></label>
+    <label title="Os pedidos de permissão aparecem aqui e no terminal; responde onde quiseres (espera até 10 min)"><input type="checkbox" id="permissoes-aqui"> responder permissões aqui</label>
+    <label><input type="checkbox" id="todas"> mostrar terminadas</label>
+    <span class="vivo" id="vivo"><i></i><span>a ligar…</span></span>
+    <a href="/torre" style="font-size:12.5px" title="Vista Torre: radar e quadro de partidas, tema escuro">Torre ↗</a>
+  </div>
+</header>
+<main>
+  <div class="erro" id="erro"></div>
+  <nav class="abas">
+    <button id="aba-mapa" class="ativa">Mapa</button>
+    <button id="aba-sessoes">Sessões</button>
+    <button id="aba-fluxos">Fluxos</button>
+    <button id="aba-worktrees">Worktrees</button>
+    <button id="aba-avisos">Avisos</button>
+    <button id="aba-metricas">Métricas</button>
+  </nav>
+  <div id="vista-mapa">
+    <div class="m-barra">
+      <button class="principal" id="m-nova" title="Criar uma worktree e arrancar nela uma sessão com papel e tarefa">+ Nova sessão</button>
+      <button class="chip-filtro" id="m-ligar" aria-pressed="false" title="Ligar duas sessões: quando a primeira termina um passo, a resposta dela entra como pedido na segunda">⇢ Ligar sessões</button>
+      <input type="search" id="m-filtro" placeholder="Filtrar por repo, branch, sessão ou ficheiro…" aria-label="Filtrar o mapa">
+      <button class="chip-filtro" id="m-vivas" aria-pressed="true" title="Esconder sessões terminadas">só vivas</button>
+      <button class="chip-filtro" id="m-com-sessao" aria-pressed="false" title="Esconder worktrees sem sessão">com sessão</button>
+      <button class="chip-filtro" id="m-precisa" aria-pressed="false" title="Só o que está à tua espera ou em colisão">precisa de mim</button>
+      <span class="zoom"><button id="m-menos" title="Afastar">−</button><span id="m-nivel">100%</span><button id="m-mais" title="Aproximar">+</button><button id="m-ajustar" title="Repor posição e zoom">ajustar</button><button id="m-atualizar" title="Reler o git de todos os repos">↻ git</button></span>
+    </div>
+    <div class="m-aviso-ligar" id="m-aviso-ligar"></div>
+    <div class="m-resumo" id="m-resumo"></div>
+    <div class="m-janela" id="m-janela"><div class="m-tela" id="m-tela"></div></div>
+    <div class="m-legenda">
+      <span>● a trabalhar</span><span>◆ à tua espera</span><span>○ parada</span><span>× terminada</span>
+      <span><i style="border-color:#d64545"></i>mesmo ficheiro, mesma branch</span>
+      <span><i style="border-color:var(--espera);border-top-style:dashed"></i>mesmo ficheiro, outra branch</span>
+      <span><i style="border-color:var(--destaque)"></i>fluxo (passa a resposta)</span>
+      <span>arrasta o fundo para mover · Ctrl + roda para zoom · arrasta o cabeçalho de um repo para o reordenar</span>
+    </div>
+  </div>
+  <div class="m-dica" id="m-dica"></div>
+  <div id="vista-fluxos" hidden></div>
+  <div id="vista-worktrees" hidden></div>
+  <div id="vista-avisos" hidden></div>
+  <div id="vista-metricas" hidden></div>
+  <div id="vista-sessoes" hidden>
+  <div class="permissoes" id="permissoes"></div>
+  <div class="espera-faixa" id="faixa"></div>
+  <div id="repos"></div>
+  </div>
+</main>
+<aside id="lateral" aria-hidden="true">
+  <header class="lat-cab" id="lat-cab"></header>
+  <nav class="lat-abas" id="lat-abas"></nav>
+  <div class="lat-corpo" id="lat-corpo"></div>
+  <div class="lat-rodape" id="lat-rodape"></div>
+</aside>
+<dialog id="dlg-nova">
+  <form method="dialog" id="form-nova">
+    <h3>Nova sessão</h3>
+    <label class="campo">Repositório<select id="nova-repo" required></select></label>
+    <label class="campo">Branch base<input id="nova-base" placeholder="devel"></label>
+    <label class="campo" id="nova-papel-campo" hidden>Papel<select id="nova-papel"><option value="">— sem papel —</option></select></label>
+    <p class="ajuda" id="nova-papel-desc"></p>
+    <label class="campo">Tarefa<textarea id="nova-tarefa" required placeholder="O que esta sessão deve fazer, como se escrevesses no terminal."></textarea></label>
+    <label class="campo">Nome da branch<input id="nova-branch" placeholder="gerado a partir da tarefa"></label>
+    <label class="campo">Permissões<select id="nova-modo"><option value="acceptEdits">aceitar edições sozinha</option><option value="default">perguntar (pedidos aparecem no painel se ligares «responder permissões aqui»)</option><option value="plan">só planear, sem editar</option></select></label>
+    <div class="botoes"><span class="nota" id="nova-nota"></span><button value="cancelar" formnovalidate>Cancelar</button><button class="sim" id="nova-criar" value="criar">Criar e arrancar</button></div>
+  </form>
+</dialog>
+<dialog id="dlg-aresta">
+  <form method="dialog" id="form-aresta">
+    <h3 id="aresta-titulo">Ligar sessões</h3>
+    <label class="campo">Quando passar<select id="aresta-gatilho"><option value="stop">sempre que a origem termina um passo</option><option value="marca">só quando a origem escreve uma marca</option></select></label>
+    <label class="campo" id="aresta-marca-campo" hidden>Marca<input id="aresta-marca" value="PRONTO"></label>
+    <label class="campo">Mensagem que o destino recebe<textarea id="aresta-modelo"></textarea></label>
+    <p class="ajuda">Variáveis: {resposta} (o que a origem respondeu), {toques} (ficheiros que tocou), {pasta} (pasta dela), {diff} (alterações por gravar, incluindo ficheiros novos), {de}, {para}, {fluxo}.</p>
+    <label class="campo">Máximo de passagens neste fluxo<input id="aresta-max" type="number" min="1" max="100" value="10"></label>
+    <div class="botoes"><span class="nota" id="aresta-nota"></span><button value="cancelar" formnovalidate>Cancelar</button><button class="sim" value="ligar">Ligar</button></div>
+  </form>
+</dialog>
+<script>
+"use strict";
+const estados = { ativa: "a trabalhar", a_espera: "à tua espera", parada: "parada", terminada: "terminada" };
+const ordemEstado = { a_espera: 0, ativa: 1, parada: 2, terminada: 3 };
+const $ = (id) => document.getElementById(id);
+let dados = [], selecionada = null, painel = { responder_permissoes: false, extensoes: 0, permissoes: [] };
+let todas = false;
+try { todas = localStorage.getItem("towerman.todas") === "1"; } catch (e) {}
+$("todas").checked = todas;
+
+function el(tag, props, ...filhos) {
+  const e = document.createElement(tag);
+  for (const [k, v] of Object.entries(props || {})) {
+    if (k === "class") e.className = v; else if (k === "onclick") e.onclick = v; else e.setAttribute(k, v);
+  }
+  for (const f of filhos) if (f != null) e.append(f);
+  return e;
+}
+
+function ha(iso) {
+  const s = (Date.now() - Date.parse(iso)) / 1000;
+  if (!isFinite(s)) return "";
+  if (s < 60) return "agora";
+  if (s < 3600) return "há " + Math.floor(s / 60) + " min";
+  if (s < 172800) return "há " + Math.floor(s / 3600) + " h";
+  return "há " + Math.floor(s / 86400) + " d";
+}
+
+function curto(caminho) { return caminho.replace(/^\/home\/[^/]+|^\/Users\/[^/]+/, "~"); }
+function nomeSessao(s) { return s.nome || s.id.slice(0, 8); }
+
+async function pedir(url) {
+  const r = await fetch(url, { credentials: "same-origin", cache: "no-store" });
+  if (r.status === 401) throw new Error("Sessão do painel expirada: corre «towerman painel» no terminal.");
+  if (!r.ok) throw new Error("O serviço respondeu " + r.status);
+  return r.json();
+}
+
+async function enviarJSON(url, corpo) {
+  const r = await fetch(url, { method: "POST", credentials: "same-origin", headers: { "Content-Type": "application/json" }, body: JSON.stringify(corpo) });
+  const j = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(j.erro || ("O serviço respondeu " + r.status));
+  return j;
+}
+
+async function carregar() {
+  try {
+    [dados, painel] = await Promise.all([pedir("/v1/sessoes" + (todas ? "?todas=1" : "")), pedir("/v1/painel")]);
+    $("erro").classList.remove("visivel");
+    desenhar();
+    if (selecionada) abrir(selecionada, false);
+    const pedida = location.hash.match(/^#sessao=(.+)$/);
+    if (pedida && procurar(decodeURIComponent(pedida[1]))) {
+      history.replaceState(null, "", location.pathname);
+      abrir(decodeURIComponent(pedida[1]), true);
+    }
+  } catch (e) {
+    $("erro").textContent = e.message;
+    $("erro").classList.add("visivel");
+  }
+}
+
+function cartao(s) {
+  const toques = el("ul", { class: "toques" });
+  for (const t of s.toques.slice(0, 3)) toques.append(el("li", {}, el("code", {}, t.caminho), el("span", {}, "· " + t.tipo + " · " + ha(t.em))));
+  const colide = (s.colisoes || []).length ? ((s.colisoes || []).some((c) => c.mesma_branch) ? " colide-mesma" : " colide") : "";
+  return el("button", { class: "cartao " + s.estado + colide, "data-abrir": s.id, title: s.cwd },
+    el("div", { class: "topo" }, el("span", { class: "ponto" }), el("span", { class: "nome" }, nomeSessao(s)),
+      s.agente && s.agente !== "claude" ? el("span", { class: "chip" }, s.agente) : null,
+      el("span", { class: "estado" }, estados[s.estado] + " · " + ha(s.visto_em))),
+    s.branch ? el("div", { class: "branch mono" }, "⎇ " + s.branch) : null,
+    s.resumo ? el("div", { class: "resumo" }, s.resumo) : null,
+    s.toques.length ? toques : null,
+    ...colisoesDe(s));
+}
+
+function colisoesDe(s) {
+  const vistos = new Set();
+  const r = [];
+  for (const c of s.colisoes || []) {
+    const chave = c.com + c.caminho;
+    if (vistos.has(chave)) continue;
+    vistos.add(chave);
+    r.push(el("div", { class: "colisao" + (c.mesma_branch ? " mesma" : "") },
+      (c.mesma_branch ? "⚠ mesma branch que " : "↔ também em ") + (c.nome_com || c.com.slice(0, 8)) + ": " + c.caminho));
+  }
+  return r.slice(0, 3);
+}
+
+function desenharPainel() {
+  $("permissoes-aqui").checked = painel.responder_permissoes;
+  if (painel.regra2) $("regra2").value = painel.regra2;
+  const ide = $("ide");
+  ide.textContent = painel.extensoes ? "IDE ligado (" + painel.extensoes + (painel.extensoes === 1 ? " janela)" : " janelas)") : "IDE não ligado";
+  ide.title = painel.extensoes ? "A extensão do Towerman está ativa nestas janelas do IDE" : "Sem a extensão do Towerman ativa: «ir para a janela» e escrever em sessões paradas ficam limitados. Corre «towerman install» e recarrega as janelas do IDE.";
+  const lista = $("permissoes");
+  lista.replaceChildren();
+  for (const p of painel.permissoes) {
+    const s = procurar(p.session_id);
+    lista.append(el("div", { class: "permissao" },
+      el("b", {}, (s ? nomeSessao(s) : p.session_id.slice(0, 8)) + " pede " + p.ferramenta),
+      el("code", {}, p.resumo || ""),
+      el("button", { class: "sim", onclick: () => decidir(p.id, "allow") }, "Permitir"),
+      el("button", { class: "nao", onclick: () => decidir(p.id, "deny") }, "Recusar")));
+  }
+}
+
+async function decidir(id, decisao) {
+  try { await enviarJSON("/v1/permissoes/" + id, { decisao }); } catch (e) { alertar(e.message); }
+  carregar();
+}
+
+function alertar(msg) {
+  $("erro").textContent = msg;
+  $("erro").classList.add("visivel");
+  setTimeout(() => $("erro").classList.remove("visivel"), 6000);
+}
+
+function desenhar() {
+  desenharPainel();
+  const cont = { a_espera: 0, ativa: 0, parada: 0, terminada: 0 };
+  const espera = [];
+  const raiz = $("repos");
+  raiz.replaceChildren();
+  for (const r of dados) {
+    const sec = el("section", { class: "repo" });
+    const nWt = r.worktrees.length;
+    sec.append(el("h2", {}, r.nome, el("small", {}, nWt + (nWt === 1 ? " worktree" : " worktrees"))));
+    for (const w of r.worktrees) {
+      w.sessoes.sort((a, b) => ordemEstado[a.estado] - ordemEstado[b.estado] || b.visto_em.localeCompare(a.visto_em));
+      const grelha = el("div", { class: "cartoes" });
+      for (const s of w.sessoes) {
+        cont[s.estado]++;
+        if (s.estado === "a_espera") espera.push(s);
+        grelha.append(cartao(s));
+      }
+      sec.append(el("div", { class: "worktree" }, el("h3", { class: "mono" }, curto(w.caminho)), grelha));
+    }
+    raiz.append(sec);
+  }
+  if (!dados.length) raiz.append(el("div", { class: "vazio" }, todas ? "Ainda não há sessões registadas." : "Nenhuma sessão viva. Abre uma janela do Claude Code ou marca «mostrar terminadas»."));
+  const c = $("contagens");
+  c.replaceChildren(
+    el("span", {}, el("b", {}, String(cont.ativa)), " a trabalhar"),
+    el("span", {}, el("b", {}, String(cont.a_espera)), " à espera"),
+    el("span", {}, el("b", {}, String(cont.parada)), " paradas"));
+  const faixa = $("faixa");
+  faixa.replaceChildren();
+  if (espera.length) {
+    faixa.append(el("b", {}, espera.length === 1 ? "1 sessão à tua espera: " : espera.length + " sessões à tua espera: "));
+    for (const s of espera) faixa.append(el("button", { "data-abrir": s.id }, nomeSessao(s)));
+  }
+  faixa.classList.toggle("visivel", espera.length > 0);
+  document.title = (espera.length ? "(" + espera.length + ") " : "") + "Towerman";
+}
+
+function procurar(id) {
+  for (const r of dados) for (const w of r.worktrees) for (const s of w.sessoes) if (s.id === id) return s;
+  return null;
+}
+
+// ---------- Painel lateral ----------
+const lateral = { id: null, aba: "conversa", conversa: null, mensagens: [], abertos: new Set(), inteiras: new Set() };
+
+function escapar(t) { return t.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c])); }
+
+// Markdown mínimo e seguro: o texto é escapado antes de qualquer marcação.
+function markdown(t) {
+  const blocos = [];
+  t = t.replace(/```[^\n]*\n([\s\S]*?)```/g, (_, c) => { blocos.push("<pre><code>" + escapar(c.replace(/\n$/, "")) + "</code></pre>"); return "\u0000" + (blocos.length - 1) + "\u0000"; });
+  const linha = (l) => escapar(l)
+    .replace(/`([^`]+)`/g, "<code>$1</code>")
+    .replace(/\*\*([^*]+)\*\*/g, "<b>$1</b>")
+    .replace(/(^|[^*])\*([^*\s][^*]*)\*/g, "$1<i>$2</i>");
+  const out = [];
+  const ls = t.split("\n");
+  for (let i = 0; i < ls.length; i++) {
+    const l = ls[i];
+    const bloco = l.match(/^\u0000(\d+)\u0000$/);
+    if (bloco) { out.push(blocos[+bloco[1]]); continue; }
+    if (/^\s*\|.*\|\s*$/.test(l)) {
+      const linhas = [];
+      while (i < ls.length && /^\s*\|.*\|\s*$/.test(ls[i])) linhas.push(ls[i++]);
+      i--;
+      const celulas = (x) => x.trim().replace(/^\||\|$/g, "").split("|").map((c) => linha(c.trim()));
+      let html = "<table>";
+      linhas.forEach((x, n) => {
+        if (/^\s*\|[\s:|-]+\|\s*$/.test(x)) return;
+        const tag = n === 0 ? "th" : "td";
+        html += "<tr>" + celulas(x).map((c) => "<" + tag + ">" + c + "</" + tag + ">").join("") + "</tr>";
+      });
+      out.push(html + "</table>");
+      continue;
+    }
+    if (/^\s*([-*]|\d+\.)\s+/.test(l)) {
+      const ordenada = /^\s*\d+\./.test(l);
+      const itens = [];
+      while (i < ls.length && /^\s*([-*]|\d+\.)\s+/.test(ls[i])) itens.push(ls[i++].replace(/^\s*([-*]|\d+\.)\s+/, ""));
+      i--;
+      out.push((ordenada ? "<ol>" : "<ul>") + itens.map((x) => "<li>" + linha(x) + "</li>").join("") + (ordenada ? "</ol>" : "</ul>"));
+      continue;
+    }
+    const titulo = l.match(/^(#{1,4})\s+(.*)/);
+    if (titulo) { out.push("<h4>" + linha(titulo[2]) + "</h4>"); continue; }
+    if (/^>\s?/.test(l)) { out.push("<blockquote>" + linha(l.replace(/^>\s?/, "")) + "</blockquote>"); continue; }
+    if (l.trim() === "") { out.push(""); continue; }
+    out.push("<p>" + linha(l) + "</p>");
+  }
+  return out.join("");
+}
+
+function resumoFerramenta(texto) {
+  const i = texto.indexOf(" ");
+  const nome = i < 0 ? texto : texto.slice(0, i);
+  let alvo = i < 0 ? "" : texto.slice(i + 1);
+  if (/^(Read|Edit|Write|MultiEdit|NotebookEdit)$/.test(nome)) alvo = alvo.split("/").slice(-2).join("/");
+  return { nome: nome.replace(/^mcp__[^_]+(?:_[^_]+)*__/, ""), alvo };
+}
+
+function desenharConversa(alvo, c) {
+  alvo.replaceChildren();
+  if (!c) { alvo.append(el("div", { class: "lat-vazio" }, "a carregar…")); return; }
+  if (!c.disponivel) { alvo.append(el("div", { class: "lat-vazio" }, "Transcrição indisponível para esta sessão.")); return; }
+  if (!c.mensagens.length) { alvo.append(el("div", { class: "lat-vazio" }, "Ainda sem mensagens.")); return; }
+  const lista = el("div", { class: "conversa" });
+  let grupo = null, n = 0;
+  for (const m of c.mensagens) {
+    n++;
+    if (m.papel === "ferramenta") {
+      if (!grupo) {
+        grupo = { itens: [], chave: "f" + n + (m.em || "") };
+        const det = el("details", { class: "ferramentas" });
+        if (lateral.abertos.has(grupo.chave)) det.open = true;
+        const chave = grupo.chave;
+        det.addEventListener("toggle", () => det.open ? lateral.abertos.add(chave) : lateral.abertos.delete(chave));
+        grupo.det = det;
+        lista.append(det);
+      }
+      grupo.itens.push(resumoFerramenta(m.texto));
+      continue;
+    }
+    if (grupo) { fecharGrupo(grupo); grupo = null; }
+    const chave = "m" + n + (m.em || "");
+    const corpo = el("div", { class: "texto" });
+    if (m.papel === "assistente") corpo.innerHTML = markdown(m.texto); else corpo.textContent = m.texto;
+    const bolha = el("div", { class: "bolha " + m.papel }, el("span", { class: "quando" }, (m.papel === "utilizador" ? "tu" : "agente") + " · " + ha(m.em)), corpo);
+    if (m.papel === "assistente" && m.texto.length > 700 && !lateral.inteiras.has(chave)) {
+      bolha.classList.add("cortada");
+      bolha.append(el("button", { class: "mais", onclick: () => { lateral.inteiras.add(chave); bolha.classList.remove("cortada"); bolha.lastChild.remove(); } }, "mostrar tudo"));
+    }
+    lista.append(bolha);
+  }
+  if (grupo) fecharGrupo(grupo);
+  alvo.append(lista);
+}
+
+function fecharGrupo(g) {
+  const nomes = [...new Set(g.itens.map((x) => x.nome))];
+  g.det.append(el("summary", {}, "🔧 " + g.itens.length + (g.itens.length === 1 ? " ação" : " ações") + " · " + nomes.slice(0, 4).join(", ") + (nomes.length > 4 ? "…" : "")),
+    el("ol", {}, ...g.itens.map((x) => el("li", { title: x.alvo }, el("span", { class: "ferr" }, x.nome), x.alvo))));
+}
+
+function desenharFicheiros(alvo, s) {
+  alvo.replaceChildren();
+  if (!s.toques.length) { alvo.append(el("div", { class: "lat-vazio" }, "Nenhum ficheiro tocado.")); return; }
+  const ul = el("ul", { class: "lista-ficheiros" });
+  for (const t of s.toques) ul.append(el("li", {}, el("span", { class: "ferr" }, t.tipo), el("code", {}, t.caminho), el("small", {}, ha(t.em))));
+  alvo.append(ul);
+}
+
+function desenharMensagens(alvo) {
+  alvo.replaceChildren();
+  if (!lateral.mensagens.length) { alvo.append(el("div", { class: "lat-vazio" }, "Ainda não enviaste mensagens a esta sessão. Usa a caixa em baixo.")); return; }
+  for (const m of lateral.mensagens) {
+    const estado = m.estado === "entregue" ? "✓ entregue " + ha(m.entregue_em) + (m.caminho === "stop" ? " · no fim de um passo" : " · no terminal")
+      : m.estado === "pendente" ? "⏳ em fila · " + (m.motivo || "") : "✕ falhou · " + m.motivo;
+    alvo.append(el("div", { class: "mensagem " + m.estado }, m.texto, el("small", {}, estado)));
+  }
+}
+
+function desenharCabecalho(s) {
+  const nota = el("span", { class: "nota" });
+  const cab = $("lat-cab");
+  const chips = el("div", { class: "lat-chips" });
+  const repo = (dados.find((r) => r.worktrees.some((w) => w.sessoes.some((x) => x.id === s.id))) || {}).nome;
+  const headless = (painel.headless || []).includes(s.id);
+  for (const t of [s.papel && "papel " + s.papel, repo && "▣ " + repo, s.branch && "⎇ " + s.branch, curto(s.cwd), s.agente + (s.pid ? " · pid " + s.pid : ""), headless && "⚙ aberta pelo Towerman, sem terminal", (painel.lancada_por || {})[s.id] && "📱 lançada por " + painel.lancada_por[s.id], "visto " + ha(s.visto_em)]) if (t) chips.append(el("span", { title: t }, t));
+  cab.replaceChildren(
+    el("div", { class: "lat-linha" }, el("h2", {}, nomeSessao(s)), el("span", { class: "lat-estado " + s.estado }, (simbolo[s.estado] || "●") + " " + estados[s.estado]),
+      el("button", { class: "fechar", title: "Fechar (Esc)", onclick: fechar }, "✕")),
+    chips,
+    el("div", { class: "lat-acoes" },
+      el("button", { onclick: async () => {
+        nota.textContent = "…";
+        try {
+          const r = await enviarJSON("/v1/sessoes/" + encodeURIComponent(s.id) + "/focar", {});
+          nota.textContent = r.ok ? "janela à frente" : r.erro;
+        } catch (e) { nota.textContent = e.message; }
+      } }, "⤴ Ir para a janela"),
+      headless ? el("button", { onclick: async () => {
+        nota.textContent = "a promover…";
+        try { const r = await enviarJSON("/v1/sessoes/" + encodeURIComponent(s.id) + "/promover", {}); nota.textContent = r.ok ? "aberta em " + r.como : r.erro; carregar(); }
+        catch (e) { nota.textContent = e.message; }
+      } }, "⬆ Promover a terminal") : null,
+      headless ? el("button", { onclick: async () => {
+        nota.textContent = "a terminar…";
+        try { await enviarJSON("/v1/sessoes/" + encodeURIComponent(s.id) + "/terminar", {}); nota.textContent = "terminada"; carregar(); }
+        catch (e) { nota.textContent = e.message; }
+      } }, "■ Terminar") : null,
+      nota));
+  if (s.estado === "a_espera") cab.append(el("div", { class: "lat-alerta" }, "◆ Esta sessão está à tua espera (pedido de permissão ou pergunta). Vai à janela ou responde em baixo."));
+  const colisoes = s.colisoes || [];
+  if (colisoes.length) {
+    const mesma = colisoes.some((c) => c.mesma_branch);
+    cab.append(el("div", { class: "lat-alerta" + (mesma ? " vermelho" : "") },
+      (mesma ? "⚠ Mesmo ficheiro, mesma branch: " : "↔ Mesmo ficheiro noutra branch: ") +
+      [...new Set(colisoes.map((c) => (c.nome_com || c.com.slice(0, 8)) + " em " + c.caminho))].slice(0, 3).join(" · ")));
+  }
+}
+
+function desenharAbas(s) {
+  const abas = [["conversa", "Conversa", null], ["ficheiros", "Ficheiros", s.toques.length], ["mensagens", "Mensagens enviadas", lateral.mensagens.length]];
+  $("lat-abas").replaceChildren(...abas.map(([id, nome, n]) => el("button", { class: lateral.aba === id ? "ativa" : "",
+    onclick: () => { lateral.aba = id; desenharLateral(true); } }, nome, n ? el("span", {}, String(n)) : null)));
+}
+
+function desenharRodape(s) {
+  const rodape = $("lat-rodape");
+  const vivo = s.estado !== "terminada";
+  const anterior = rodape.querySelector("textarea");
+  const rascunho = anterior && anterior.dataset.sessao === s.id ? anterior.value : "";
+  const caixa = el("textarea", { placeholder: vivo ? "Escreve para esta sessão… (Ctrl+Enter envia)" : "A sessão terminou.", rows: "2" });
+  caixa.dataset.sessao = s.id;
+  caixa.value = rascunho;
+  caixa.disabled = !vivo;
+  const destino = el("span", {}, !vivo ? "" : (painel.headless || []).includes(s.id) ? "Entra já, pelo stdin da sessão (aberta pelo Towerman)." : s.estado === "parada"
+    ? (painel.extensoes ? "Entra já no terminal da sessão." : "Fica em fila até a sessão voltar a trabalhar.")
+    : s.estado === "a_espera" ? "Entra quando a sessão terminar o pedido atual." : "Entra quando a sessão terminar o passo atual.");
+  const botao = el("button", { class: "sim" }, "Enviar");
+  botao.disabled = !vivo;
+  const enviar = async () => {
+    const texto = caixa.value.trim();
+    if (!texto) return;
+    botao.disabled = true;
+    try {
+      const m = await enviarJSON("/v1/sessoes/" + encodeURIComponent(s.id) + "/mensagens", { texto });
+      caixa.value = "";
+      destino.textContent = m.estado === "entregue" ? "✓ Entregue no terminal." : "⏳ " + (m.motivo || "Em fila.");
+      await carregarMensagensLateral(s.id);
+      lateral.aba = "mensagens";
+      desenharLateral(true);
+    } catch (e) { destino.textContent = e.message; }
+    botao.disabled = false;
+  };
+  botao.onclick = enviar;
+  caixa.addEventListener("keydown", (e) => { if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) { e.preventDefault(); enviar(); } });
+  rodape.replaceChildren(caixa, el("div", { class: "linha" }, destino, botao));
+  if (anterior && document.activeElement === anterior) caixa.focus();
+}
+
+function desenharLateral(trocouAba) {
+  const s = procurar(lateral.id);
+  if (!s) return;
+  desenharCabecalho(s);
+  desenharAbas(s);
+  const corpo = $("lat-corpo");
+  const noFim = corpo.scrollHeight - corpo.scrollTop - corpo.clientHeight < 60;
+  const topo = corpo.scrollTop;
+  if (lateral.aba === "conversa") desenharConversa(corpo, lateral.conversa);
+  else if (lateral.aba === "ficheiros") desenharFicheiros(corpo, s);
+  else desenharMensagens(corpo);
+  if (trocouAba) corpo.scrollTop = lateral.aba === "conversa" ? corpo.scrollHeight : 0;
+  else corpo.scrollTop = noFim && lateral.aba === "conversa" ? corpo.scrollHeight : topo;
+  if (!document.activeElement || !document.activeElement.matches("#lat-rodape textarea")) desenharRodape(s);
+}
+
+async function carregarMensagensLateral(id) {
+  try { lateral.mensagens = await pedir("/v1/sessoes/" + encodeURIComponent(id) + "/mensagens"); } catch (e) { lateral.mensagens = []; }
+}
+
+async function abrir(id, novo) {
+  if (!procurar(id)) return;
+  if (novo || lateral.id !== id) {
+    if (lateral.id !== id) { lateral.conversa = null; lateral.abertos.clear(); lateral.inteiras.clear(); lateral.mensagens = []; $("lat-rodape").replaceChildren(); }
+    lateral.id = id;
+    lateral.aba = "conversa";
+  }
+  selecionada = id;
+  $("m-dica").classList.remove("visivel");
+  $("lateral").classList.add("aberto");
+  $("lateral").setAttribute("aria-hidden", "false");
+  desenharLateral(novo);
+  const [c] = await Promise.all([
+    pedir("/v1/sessoes/" + encodeURIComponent(id) + "/conversa").catch(() => ({ disponivel: false, mensagens: [] })),
+    carregarMensagensLateral(id)]);
+  if (lateral.id !== id) return;
+  const mudou = JSON.stringify(c) !== JSON.stringify(lateral.conversa);
+  lateral.conversa = c;
+  if (mudou || novo) desenharLateral(novo);
+}
+
+function fechar() {
+  selecionada = null;
+  lateral.id = null;
+  $("lateral").classList.remove("aberto");
+  $("lateral").setAttribute("aria-hidden", "true");
+}
+
+document.addEventListener("keydown", (e) => { if (e.key === "Escape") { if (mapa.ligando) pararLigar(); else fechar(); } });
+// Os cartões e nós são redesenhados a cada evento ao vivo; se isso acontecer entre carregar e
+// largar o botão, o browser não gera click. Por isso abre-se pela sessão sob o ponteiro nos dois momentos.
+let abrirAoLargar = null;
+document.addEventListener("pointerdown", (e) => { const a = e.target.closest("[data-abrir]"); abrirAoLargar = a ? a.dataset.abrir : null; });
+document.addEventListener("pointerup", (e) => {
+  const a = e.target.closest("[data-abrir]");
+  if (a && abrirAoLargar === a.dataset.abrir && e.button === 0) {
+    if (mapa.ligando && a.classList.contains("no")) escolherParaLigar(a.dataset.abrir);
+    else abrir(a.dataset.abrir, true);
+  }
+  abrirAoLargar = null;
+});
+document.addEventListener("keydown", (e) => {
+  const a = e.target.closest && e.target.closest("[data-abrir]");
+  if (a && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); abrir(a.dataset.abrir, true); }
+});
+
+$("permissoes-aqui").onchange = async (e) => {
+  try { painel = await enviarJSON("/v1/painel", { responder_permissoes: e.target.checked }); } catch (err) { alertar(err.message); }
+  desenharPainel();
+};
+$("regra2").onchange = async (e) => {
+  try { painel = await enviarJSON("/v1/painel", { regra2: e.target.value }); } catch (err) { alertar(err.message); }
+  desenharPainel();
+};
+
+const vistas = ["mapa", "sessoes", "fluxos", "worktrees", "avisos", "metricas"];
+let vistaAtual = "mapa";
+function mostrar(v) {
+  vistaAtual = v;
+  try { localStorage.setItem("towerman.vista", v); } catch (e) {}
+  for (const x of vistas) {
+    $("vista-" + x).hidden = x !== v;
+    $("aba-" + x).classList.toggle("ativa", x === v);
+  }
+  if (v === "mapa") carregarMapa();
+  if (v === "worktrees") carregarWorktrees();
+  if (v === "fluxos") carregarFluxos();
+  if (v === "avisos") carregarAvisos();
+  if (v === "metricas") carregarMetricas();
+}
+for (const v of vistas) $("aba-" + v).onclick = () => mostrar(v);
+
+async function carregarWorktrees() {
+  const alvo = $("vista-worktrees");
+  alvo.replaceChildren(el("div", { class: "branch" }, "a inspecionar os repositórios…"));
+  try {
+    const rel = await pedir("/v1/worktrees");
+    const tabela = el("table", {}, el("tr", {}, ...["Repo", "Estado", "Branch", "↑ / ↓ base", "Último commit", "Sessão", "Worktree"].map((h) => el("th", {}, h))));
+    for (const l of rel.linhas) {
+      tabela.append(el("tr", {},
+        el("td", {}, l.repo), el("td", { class: "estado-wt e-" + l.estado }, l.estado),
+        el("td", { class: "mono" }, l.branch || "(destacada)"),
+        el("td", { class: "mono" }, l.base && l.branch !== l.base ? "↑" + l.frente + " ↓" + l.atras + " " + l.base : ""),
+        el("td", {}, l.ultimo_commit || l.erro || ""), el("td", {}, l.sessao || ""),
+        el("td", { class: "mono" }, curto(l.worktree))));
+    }
+    const avisos = [];
+    for (const [repo, rs] of Object.entries(rel.remotas_proprias || {})) {
+      if (rs.length > 1) avisos.push(el("div", { class: "espera-faixa visivel" }, repo + ": " + rs.length + " branches tuas no origin (" + rs.join(", ") + "). A tua regra é no máximo uma."));
+    }
+    alvo.replaceChildren(...avisos, el("div", { class: "tabela-rolagem" }, tabela),
+      el("p", { class: "branch" }, "Para remover as worktrees tuas já integradas: towerman wt limpar (pede confirmação)."));
+  } catch (e) { alvo.replaceChildren(el("div", { class: "branch" }, e.message)); }
+}
+
+async function carregarAvisos() {
+  const alvo = $("vista-avisos");
+  try {
+    const as = await pedir("/v1/avisos");
+    alvo.replaceChildren();
+    if (!as.length) alvo.append(el("div", { class: "vazio" }, "Nenhum aviso de colisão nos últimos 7 dias."));
+    const regras = { 1: "Pasta já ocupada", 2: "Edição em conflito (mesma branch)", 3: "Mesmo ficheiro noutra branch" };
+    for (const a of as) {
+      const botao = a.falso_alarme ? el("span", { class: "branch" }, "marcado como falso alarme")
+        : el("button", { onclick: async () => { try { await enviarJSON("/v1/avisos/" + a.id + "/falso-alarme", {}); carregarAvisos(); } catch (e) { alertar(e.message); } } }, "Foi falso alarme");
+      alvo.append(el("div", { class: "aviso-linha" + (a.falso_alarme ? " falso" : "") },
+        el("b", {}, (regras[a.regra] || "Aviso") + ": "), el("code", {}, a.caminho), " · " + (a.nome_de || a.de.slice(0, 8)) + " × " + (a.nome_para || a.para.slice(0, 8)) + " · " + ha(a.em) + " ",
+        botao, el("small", {}, a.motivo)));
+    }
+  } catch (e) { alvo.replaceChildren(el("div", { class: "branch" }, e.message)); }
+}
+
+// ---------- Métricas ----------
+// Alvos do PRD 2.0 (_reversa_sdd/prd.md, secção 4): só referência, sem alertas.
+const metricasAreas = [
+  ["Atenção", [
+    ["Tempo até responder a uma permissão", "mediana < 2 min", (m) => m.atencao.tempo_permissao],
+    ["Permissões expiradas sem resposta", "< 5%", (m) => m.atencao.permissoes_expiradas],
+    ["Respostas fora do terminal", "linha de base", (m) => m.atencao.fora_do_terminal],
+    ["Tempo até responder a uma decisão", "mediana < 3 min", (m) => m.atencao.tempo_decisao],
+  ]],
+  ["Colisões", [
+    ["Falsos alarmes", "< 10%", (m) => m.colisoes.falsos_alarmes],
+    ["Colisões na mesma branch que chegam a commit (aproximação)", "0 por semana", (m) => m.colisoes.colisoes_a_commit],
+  ]],
+  ["Decisões no pulso", [
+    ["Descartadas («Não é pergunta»)", "< 10%", (m) => m.decisoes.descartadas],
+    ["Respondidas por botão", "> 70%", (m) => m.decisoes.por_botao],
+  ]],
+  ["Fiabilidade", [
+    ["Sessões lançadas à distância com sucesso", "> 80%", (m) => m.fiabilidade.lancadas_com_sucesso],
+    ["Mensagens que falharam a entrega", "< 5%", (m) => m.fiabilidade.mensagens_falhadas],
+    ["Fluxos parados no limite de passos", "linha de base", (m) => m.fiabilidade.fluxos_no_limite],
+  ]],
+];
+let diasMetricas = lerLocal("towerman.dias", 7);
+function duracao(s) { return s < 60 ? s + " s" : s < 3600 ? Math.round(s / 60) + " min" : (s / 3600).toFixed(1) + " h"; }
+// Devolve [texto, casos]: proporções, tempos e colisões têm formatos diferentes.
+function valorMetrica(v) {
+  if ("denominador" in v) return [v.denominador ? Math.round(v.numerador * 100 / v.denominador) + "% (" + v.numerador + " de " + v.denominador + ")" : "sem dados", v.denominador];
+  if ("mediana_s" in v) return [v.mediana_s == null ? "sem dados" : duracao(v.mediana_s) + (v.p90_s == null ? "" : " · p90 " + duracao(v.p90_s)), v.casos];
+  return [v.casos + " (" + v.por_semana + " por semana)", v.casos];
+}
+const nomesOrigem = { relogio: "relógio", iphone: "iPhone", mac: "Mac" };
+async function carregarMetricas() {
+  const alvo = $("vista-metricas");
+  const periodo = el("select", { "aria-label": "Período" }, ...[1, 7, 30].map((d) => el("option", { value: d }, d === 1 ? "último dia" : "últimos " + d + " dias")));
+  periodo.value = diasMetricas;
+  periodo.onchange = () => { diasMetricas = Number(periodo.value); gravarLocal("towerman.dias", diasMetricas); carregarMetricas(); };
+  const barra = el("div", { class: "met-barra" }, "Período ", periodo);
+  try {
+    const m = await pedir("/v1/metricas?dias=" + diasMetricas);
+    alvo.replaceChildren(barra);
+    barra.append(el("span", {}, "· " + m.computador + " (só este computador)"));
+    for (const [titulo, linhas] of metricasAreas) {
+      const tabela = el("table", {}, el("tr", {}, ...["Métrica", "Valor", "Alvo", "Casos"].map((h) => el("th", {}, h))));
+      for (const [nome, alvoPRD, obter] of linhas) {
+        const [texto, casos] = valorMetrica(obter(m));
+        const valor = el("td", { class: "valor" }, texto);
+        if (casos > 0 && casos < 5) valor.append(el("small", {}, "poucos dados"));
+        tabela.append(el("tr", {}, el("td", {}, nome), valor, el("td", {}, alvoPRD), el("td", {}, String(casos))));
+      }
+      alvo.append(el("div", { class: "met-area" }, el("h3", {}, titulo), tabela));
+    }
+    const canais = el("table", {}, el("tr", {}, el("th", {}, "Canal"), el("th", {}, "Respostas")));
+    for (const l of m.atencao.por_canal) canais.append(el("tr", {}, el("td", {}, l.nome + (nomesOrigem[l.origem] ? " (" + nomesOrigem[l.origem] + ")" : "")), el("td", { class: "valor" }, String(l.respostas))));
+    if (!m.atencao.por_canal.length) canais.append(el("tr", {}, el("td", { colspan: 2 }, "sem dados")));
+    alvo.append(el("div", { class: "met-area" }, el("h3", {}, "Respostas fora do terminal, por canal (permissões e decisões)"), canais));
+    alvo.append(el("p", { class: "met-nota" }, "Respostas tocadas numa notificação espelhada no relógio contam como iPhone. «Desconhecido» são respostas anteriores a esta versão. Para ver vários computadores juntos, abra Métricas no app do Mac."));
+  } catch (e) { alvo.replaceChildren(barra, el("div", { class: "branch" }, e.message)); }
+}
+
+// ---------- Mapa ----------
+const simbolo = { ativa: "●", a_espera: "◆", parada: "○", terminada: "×" };
+const mapa = { dados: null, k: 1, x: 0, y: 0, filtro: "", vivas: true, comSessao: false, precisa: false,
+  ordem: lerLocal("towerman.ordem", []), recolhidas: new Set(lerLocal("towerman.recolhidas", [])) };
+function lerLocal(chave, padrao) { try { return JSON.parse(localStorage.getItem(chave)) ?? padrao; } catch (e) { return padrao; } }
+function gravarLocal(chave, valor) { try { localStorage.setItem(chave, JSON.stringify(valor)); } catch (e) {} }
+
+let pedidoMapa = null;
+async function carregarMapa(fresco) {
+  if (pedidoMapa && !fresco) return pedidoMapa;
+  pedidoMapa = (async () => {
+    try {
+      mapa.dados = await pedir("/v1/mapa?todas=1" + (fresco ? "&fresco=1" : ""));
+      desenharMapa();
+    } catch (e) { alertar(e.message); }
+    pedidoMapa = null;
+  })();
+  return pedidoMapa;
+}
+
+function sessoesVisiveis(f) {
+  return f.sessoes.filter((s) => !mapa.vivas || s.estado !== "terminada");
+}
+
+function corresponde(z, f, sessoes) {
+  const q = mapa.filtro.trim().toLowerCase();
+  if ((mapa.comSessao || !f.no_git) && !sessoes.length) return false;
+  if (mapa.precisa && !sessoes.some((s) => s.estado === "a_espera" || (s.colisoes || []).length)) return false;
+  if (!q) return true;
+  const texto = [z.nome, f.branch, f.caminho, ...sessoes.flatMap((s) => [s.nome, s.resumo, ...s.toques.map((t) => t.caminho)])].join(" ").toLowerCase();
+  return texto.includes(q);
+}
+
+function ordenarZonas(zonas) {
+  const pos = new Map(mapa.ordem.map((r, i) => [r, i]));
+  return [...zonas].sort((a, b) => (pos.has(a.raiz) ? pos.get(a.raiz) : 1e6) - (pos.has(b.raiz) ? pos.get(b.raiz) : 1e6) || a.nome.localeCompare(b.nome));
+}
+
+function desenharMapa() {
+  if (!mapa.dados) return;
+  const tela = $("m-tela");
+  const zonas = ordenarZonas(mapa.dados.zonas);
+  let nZonas = 0, nFaixas = 0, nSessoes = 0, nEspera = 0;
+  const pares = new Map();
+  const blocos = [];
+  for (const z of zonas) {
+    const faixas = [];
+    for (const f of z.faixas) {
+      const sessoes = sessoesVisiveis(f);
+      if (!corresponde(z, f, sessoes)) continue;
+      faixas.push([f, sessoes]);
+    }
+    if (!faixas.length) continue;
+    nZonas++;
+    const recolhida = mapa.recolhidas.has(z.raiz);
+    const contaSessoes = faixas.reduce((n, [, ss]) => n + ss.length, 0);
+    const contaEspera = faixas.reduce((n, [, ss]) => n + ss.filter((s) => s.estado === "a_espera").length, 0);
+    const corpo = el("div", { class: "faixas" });
+    for (const [f, sessoes] of faixas) {
+      nFaixas++;
+      const nos = el("div", { class: "nos" });
+      for (const s of sessoes) {
+        nSessoes++;
+        if (s.estado === "a_espera") nEspera++;
+        const colideMesma = (s.colisoes || []).some((c) => c.mesma_branch);
+        const no = el("button", { class: "no " + s.estado + (colideMesma ? " colide-mesma" : ""), "data-id": s.id, "data-abrir": s.id },
+          el("span", { class: "marca" }, simbolo[s.estado] || "●"), el("span", { class: "nome" }, nomeSessao(s)),
+          s.papel ? el("span", { class: "papel" }, s.papel) : null,
+          (painel.headless || []).includes(s.id) ? el("span", { class: "eng", title: (painel.lancada_por || {})[s.id] ? "Lançada por " + painel.lancada_por[s.id] + ", sem terminal" : "Aberta pelo Towerman, sem terminal" }, (painel.lancada_por || {})[s.id] ? "📱" : "⚙") : null,
+          el("small", {}, ha(s.visto_em)));
+        if (mapa.origem === s.id) no.classList.add("origem");
+        no.addEventListener("mouseenter", (e) => focarNo(s, e));
+        no.addEventListener("mousemove", moverDica);
+        no.addEventListener("mouseleave", desfocarNo);
+        nos.append(no);
+        for (const c of s.colisoes || []) {
+          const chave = [s.id, c.com].sort().join("|");
+          if (!pares.has(chave)) pares.set(chave, { a: s.id, b: c.com, mesma: c.mesma_branch, ficheiros: new Set() });
+          pares.get(chave).ficheiros.add(c.caminho);
+        }
+      }
+      if (!sessoes.length) nos.append(el("span", { class: "vazio-faixa" }, f.no_git ? "sem sessão" : ""));
+      const info = el("span", { class: "info" });
+      if (f.estado) info.append(el("span", { class: "etiqueta" }, f.principal ? "principal" : f.estado));
+      if (f.no_git && f.branch !== z.base && z.base) info.append(el("span", {}, "↑" + f.frente + " ↓" + f.atras));
+      if (f.ultimo_commit) info.append(el("span", {}, f.ultimo_commit));
+      corpo.append(el("div", { class: "faixa e-" + (f.estado || "ativa"), title: curto(f.caminho) },
+        el("div", { class: "trilho" }, el("span", { class: "br" }, "⎇ " + (f.branch || "(destacada)")), info), nos));
+    }
+    const seta = el("button", { class: "seta", title: recolhida ? "Expandir" : "Recolher",
+      onclick: () => { recolhida ? mapa.recolhidas.delete(z.raiz) : mapa.recolhidas.add(z.raiz); gravarLocal("towerman.recolhidas", [...mapa.recolhidas]); desenharMapa(); } },
+      recolhida ? "▸" : "▾");
+    const mais = faixas.some(([f]) => f.no_git) ? el("button", { class: "seta", title: "Nova sessão neste repo", onclick: () => abrirNovaSessao(z.raiz) }, "+") : null;
+    const cab = el("header", { draggable: "true" }, seta, el("h3", {}, z.nome), mais,
+      el("span", { class: "meta-zona" }, el("span", {}, (z.base ? "base " + z.base + " · " : "") + faixas.length + " wt · " + contaSessoes + " sessões"),
+        contaEspera ? el("b", { style: "color:var(--espera)" }, "◆ " + contaEspera) : null));
+    const zona = el("section", { class: "zona" + (recolhida ? " recolhida" : ""), "data-raiz": z.raiz }, cab);
+    if ((z.remotas_proprias || []).length > 1) zona.append(el("div", { class: "alerta-remotas" }, "⚠ " + z.remotas_proprias.length + " branches tuas no origin"));
+    zona.append(corpo);
+    ligarArrasto(cab, zona, z.raiz);
+    blocos.push(zona);
+  }
+  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  tela.replaceChildren(svg, ...blocos);
+  if (!blocos.length) tela.append(el("div", { class: "vazio" }, mapa.dados.zonas.length ? "Nada corresponde aos filtros." : "Ainda não há repositórios nem sessões."));
+  $("m-resumo").replaceChildren(
+    el("b", {}, String(nZonas)), " repos · ", el("b", {}, String(nFaixas)), " worktrees · ", el("b", {}, String(nSessoes)), " sessões",
+    nEspera ? el("span", {}, " · ", el("b", { style: "color:var(--espera)" }, nEspera + " à tua espera")) : "",
+    pares.size ? el("span", {}, " · ", el("b", {}, String(pares.size)), pares.size === 1 ? " colisão" : " colisões") : "",
+    el("span", {}, " · git lido " + ha(mapa.dados.inventario_em)));
+  mapa.pares = [...pares.values()];
+  mapa.fluxos = mapa.dados.arestas || [];
+  requestAnimationFrame(desenharLigacoes);
+}
+
+function caixa(no, ref) {
+  const r = no.getBoundingClientRect();
+  return { esq: (r.left - ref.left) / mapa.k, dir: (r.right - ref.left) / mapa.k, y: (r.top + r.height / 2 - ref.top) / mapa.k };
+}
+
+function desenharLigacoes() {
+  const tela = $("m-tela"), svg = tela.querySelector("svg");
+  if (!svg) return;
+  const ref = tela.getBoundingClientRect();
+  svg.setAttribute("width", tela.scrollWidth);
+  svg.setAttribute("height", tela.scrollHeight);
+  svg.replaceChildren();
+  let n = 0;
+  for (const p of mapa.pares || []) {
+    const na = tela.querySelector('.no[data-id="' + CSS.escape(p.a) + '"]'), nb = tela.querySelector('.no[data-id="' + CSS.escape(p.b) + '"]');
+    if (!na || !nb || na.offsetParent === null || nb.offsetParent === null) continue;
+    let a = caixa(na, ref), b = caixa(nb, ref);
+    if (b.esq < a.esq) [a, b] = [b, a];
+    let d;
+    if (b.esq - a.dir > 40) {
+      // nós lado a lado: do lado direito de um ao lado esquerdo do outro
+      const meio = (b.esq - a.dir) / 2;
+      d = "M" + a.dir + "," + a.y + " C" + (a.dir + meio) + "," + a.y + " " + (b.esq - meio) + "," + b.y + " " + b.esq + "," + b.y;
+    } else {
+      // nós na mesma coluna: arco pela direita, cada par com o seu afastamento
+      const x = Math.max(a.dir, b.dir) + 28 + (n % 4) * 16;
+      d = "M" + a.dir + "," + a.y + " C" + x + "," + a.y + " " + x + "," + b.y + " " + b.dir + "," + b.y;
+    }
+    n++;
+    const caminho = document.createElementNS("http://www.w3.org/2000/svg", "path");
+    caminho.setAttribute("d", d);
+    caminho.setAttribute("class", p.mesma ? "mesma" : "outra");
+    caminho.dataset.a = p.a; caminho.dataset.b = p.b;
+    svg.append(caminho);
+  }
+  if (!svg.querySelector("marker")) {
+    const defs = document.createElementNS("http://www.w3.org/2000/svg", "defs");
+    defs.innerHTML = '<marker id="ponta" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"></path></marker>';
+    svg.prepend(defs);
+  }
+  svg.style.color = getComputedStyle(document.documentElement).getPropertyValue("--destaque");
+  for (const f of mapa.fluxos || []) {
+    const na = tela.querySelector('.no[data-id="' + CSS.escape(f.de) + '"]'), nb = tela.querySelector('.no[data-id="' + CSS.escape(f.para) + '"]');
+    if (!na || !nb || na.offsetParent === null || nb.offsetParent === null) continue;
+    const a = caixa(na, ref), b = caixa(nb, ref);
+    let d;
+    if (b.esq - a.dir > 40) d = "M" + a.dir + "," + a.y + " C" + (a.dir + 60) + "," + a.y + " " + (b.esq - 60) + "," + b.y + " " + (b.esq - 4) + "," + b.y;
+    else if (a.esq - b.dir > 40) d = "M" + a.esq + "," + a.y + " C" + (a.esq - 60) + "," + a.y + " " + (b.dir + 60) + "," + b.y + " " + (b.dir + 4) + "," + b.y;
+    else { const x = Math.min(a.esq, b.esq) - 30; d = "M" + a.esq + "," + a.y + " C" + x + "," + a.y + " " + x + "," + b.y + " " + (b.esq - 4) + "," + b.y; }
+    const c = document.createElementNS("http://www.w3.org/2000/svg", "path");
+    c.setAttribute("d", d);
+    c.setAttribute("class", "fluxo");
+    c.setAttribute("marker-end", "url(#ponta)");
+    c.dataset.a = f.de; c.dataset.b = f.para;
+    svg.append(c);
+  }
+}
+
+function focarNo(s, e) {
+  for (const c of $("m-tela").querySelectorAll("svg path")) {
+    const liga = c.dataset.a === s.id || c.dataset.b === s.id;
+    c.classList.toggle("foco", liga);
+    c.classList.toggle("apagada", !liga);
+  }
+  const dica = $("m-dica");
+  dica.replaceChildren(el("b", {}, nomeSessao(s)), " · " + estados[s.estado],
+    s.resumo ? el("div", {}, "«" + s.resumo + "»") : null,
+    ...s.toques.slice(0, 4).map((t) => el("code", {}, t.caminho + " · " + t.tipo + " · " + ha(t.em))),
+    ...(s.colisoes || []).slice(0, 3).map((c) => el("div", { style: "color:" + (c.mesma_branch ? "#d64545" : "var(--espera)") },
+      (c.mesma_branch ? "⚠ mesma branch que " : "↔ também em ") + (c.nome_com || c.com.slice(0, 8)) + ": " + c.caminho)));
+  dica.classList.add("visivel");
+  moverDica(e);
+}
+function moverDica(e) {
+  const d = $("m-dica");
+  d.style.left = Math.min(e.clientX + 14, innerWidth - d.offsetWidth - 8) + "px";
+  d.style.top = Math.min(e.clientY + 14, innerHeight - d.offsetHeight - 8) + "px";
+}
+function desfocarNo() {
+  for (const c of $("m-tela").querySelectorAll("svg path")) c.classList.remove("foco", "apagada");
+  $("m-dica").classList.remove("visivel");
+}
+
+function ligarArrasto(cab, zona, raiz) {
+  cab.addEventListener("dragstart", (e) => { e.dataTransfer.setData("text/plain", raiz); e.dataTransfer.effectAllowed = "move"; });
+  zona.addEventListener("dragover", (e) => { e.preventDefault(); zona.classList.add("alvo"); });
+  zona.addEventListener("dragleave", () => zona.classList.remove("alvo"));
+  zona.addEventListener("drop", (e) => {
+    e.preventDefault();
+    zona.classList.remove("alvo");
+    const origem = e.dataTransfer.getData("text/plain");
+    if (!origem || origem === raiz) return;
+    const ordem = ordenarZonas(mapa.dados.zonas).map((z) => z.raiz).filter((r) => r !== origem);
+    ordem.splice(ordem.indexOf(raiz), 0, origem);
+    mapa.ordem = ordem;
+    gravarLocal("towerman.ordem", ordem);
+    desenharMapa();
+  });
+}
+
+function aplicarVista() {
+  $("m-tela").style.transform = "translate(" + mapa.x + "px," + mapa.y + "px) scale(" + mapa.k + ")";
+  $("m-nivel").textContent = Math.round(mapa.k * 100) + "%";
+}
+function zoom(fator, cx, cy) {
+  const janela = $("m-janela").getBoundingClientRect();
+  const px = (cx ?? janela.width / 2), py = (cy ?? janela.height / 2);
+  const k = Math.min(2, Math.max(0.35, mapa.k * fator));
+  mapa.x = px - (px - mapa.x) * (k / mapa.k);
+  mapa.y = py - (py - mapa.y) * (k / mapa.k);
+  mapa.k = k;
+  aplicarVista();
+}
+function ajustar() {
+  const largura = $("m-janela").clientWidth;
+  $("m-tela").style.width = Math.max(480, largura - 2) + "px";
+  mapa.k = 1; mapa.x = 0; mapa.y = 0;
+  aplicarVista();
+  requestAnimationFrame(desenharLigacoes);
+}
+$("m-mais").onclick = () => zoom(1.2);
+$("m-menos").onclick = () => zoom(1 / 1.2);
+$("m-ajustar").onclick = ajustar;
+$("m-atualizar").onclick = () => carregarMapa(true);
+$("m-janela").addEventListener("wheel", (e) => {
+  if (!e.ctrlKey) { mapa.y -= e.deltaY; mapa.x -= e.deltaX; aplicarVista(); e.preventDefault(); return; }
+  e.preventDefault();
+  const r = $("m-janela").getBoundingClientRect();
+  zoom(e.deltaY < 0 ? 1.1 : 1 / 1.1, e.clientX - r.left, e.clientY - r.top);
+}, { passive: false });
+(function () {
+  const janela = $("m-janela");
+  let inicio = null;
+  janela.addEventListener("pointerdown", (e) => {
+    if (e.target.closest(".no, .zona > header, button")) return;
+    inicio = { x: e.clientX - mapa.x, y: e.clientY - mapa.y };
+    janela.classList.add("arrastar");
+    janela.setPointerCapture(e.pointerId);
+  });
+  janela.addEventListener("pointermove", (e) => {
+    if (!inicio) return;
+    mapa.x = e.clientX - inicio.x; mapa.y = e.clientY - inicio.y;
+    aplicarVista();
+  });
+  const parar = () => { inicio = null; janela.classList.remove("arrastar"); };
+  janela.addEventListener("pointerup", parar);
+  janela.addEventListener("pointercancel", parar);
+})();
+for (const [id, campo] of [["m-vivas", "vivas"], ["m-com-sessao", "comSessao"], ["m-precisa", "precisa"]]) {
+  $(id).onclick = () => { mapa[campo] = !mapa[campo]; $(id).setAttribute("aria-pressed", String(mapa[campo])); desenharMapa(); };
+}
+$("m-filtro").addEventListener("input", (e) => { mapa.filtro = e.target.value; desenharMapa(); });
+addEventListener("resize", () => { if (vistaAtual === "mapa") requestAnimationFrame(desenharLigacoes); });
+
+// ---------- Orquestração (v0.5) ----------
+const modeloPadrao = "Mensagem automática do fluxo «{fluxo}» (Towerman): a sessão «{de}» terminou um passo.\n\nO que ela respondeu:\n{resposta}\n\nFicheiros que tocou: {toques}\nPasta de trabalho dela: {pasta}\n\nAlterações por gravar na pasta dela:\n{diff}";
+
+function avisoLigar(texto) {
+  const a = $("m-aviso-ligar");
+  a.textContent = texto;
+  a.classList.toggle("visivel", !!texto);
+}
+function pararLigar() {
+  mapa.ligando = false;
+  mapa.origem = null;
+  $("m-ligar").setAttribute("aria-pressed", "false");
+  $("m-janela").classList.remove("ligando");
+  avisoLigar("");
+  desenharMapa();
+}
+$("m-ligar").onclick = () => {
+  if (mapa.ligando) return pararLigar();
+  mapa.ligando = true;
+  $("m-ligar").setAttribute("aria-pressed", "true");
+  $("m-janela").classList.add("ligando");
+  avisoLigar("Clica na sessão de origem (a que faz o trabalho). Esc cancela.");
+};
+function escolherParaLigar(id) {
+  if (!mapa.origem) {
+    mapa.origem = id;
+    avisoLigar("Origem: " + nomeSessao(procurar(id)) + ". Agora clica na sessão de destino (a que recebe a resposta).");
+    desenharMapa();
+    return;
+  }
+  if (id === mapa.origem) return;
+  const de = procurar(mapa.origem), para = procurar(id);
+  $("aresta-titulo").textContent = "Ligar " + nomeSessao(de) + " ⇢ " + nomeSessao(para);
+  $("aresta-modelo").value = modeloPadrao;
+  $("aresta-nota").textContent = "";
+  $("form-aresta").dataset.de = de.id;
+  $("form-aresta").dataset.para = para.id;
+  $("dlg-aresta").showModal();
+}
+$("aresta-gatilho").onchange = (e) => { $("aresta-marca-campo").hidden = e.target.value !== "marca"; };
+$("form-aresta").addEventListener("submit", async (e) => {
+  if (e.submitter && e.submitter.value === "cancelar") { pararLigar(); return; }
+  e.preventDefault();
+  const f = e.target;
+  try {
+    await enviarJSON("/v1/fluxos/arestas", { de: f.dataset.de, para: f.dataset.para, gatilho: $("aresta-gatilho").value,
+      marca: $("aresta-marca").value, modelo: $("aresta-modelo").value, max_passos: Number($("aresta-max").value) });
+    $("dlg-aresta").close();
+    pararLigar();
+    carregarMapa();
+  } catch (err) { $("aresta-nota").textContent = err.message; }
+});
+
+async function carregarPapeis(raiz) {
+  const sel = $("nova-papel");
+  sel.replaceChildren(el("option", { value: "" }, "— sem papel —"));
+  try {
+    const ps = await pedir("/v1/papeis?raiz=" + encodeURIComponent(raiz));
+    for (const p of ps) sel.append(el("option", { value: p.nome, "data-desc": p.descricao + (p.ferramentas.length ? " · ferramentas: " + p.ferramentas.join(", ") : "") + " · " + p.origem }, p.nome));
+  } catch (e) {}
+  // Sem papéis em .claude/agents, o seletor só teria «sem papel»: esconde-se.
+  $("nova-papel-campo").hidden = sel.options.length < 2;
+  $("nova-papel-desc").textContent = "";
+}
+$("nova-papel").onchange = (e) => { const o = e.target.selectedOptions[0]; $("nova-papel-desc").textContent = (o && o.dataset.desc) || ""; };
+$("nova-repo").onchange = (e) => {
+  const z = (mapa.dados.zonas || []).find((x) => x.raiz === e.target.value);
+  $("nova-base").value = (z && z.base) || "";
+  carregarPapeis(e.target.value);
+};
+function slugJS(t) { return t.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 40).replace(/-$/, ""); }
+$("nova-tarefa").addEventListener("input", (e) => { $("nova-branch").placeholder = "feat/" + (slugJS(e.target.value) || "…"); });
+async function abrirNovaSessao(raiz) {
+  if (!mapa.dados) await carregarMapa();
+  const sel = $("nova-repo");
+  sel.replaceChildren(...(mapa.dados.zonas || []).filter((z) => z.faixas.some((f) => f.no_git)).map((z) => el("option", { value: z.raiz }, z.nome)));
+  if (raiz) sel.value = raiz;
+  sel.dispatchEvent(new Event("change"));
+  $("nova-tarefa").value = "";
+  $("nova-branch").value = "";
+  $("nova-nota").textContent = (painel.headless || []).length + " de " + (painel.max_headless || 3) + " sessões do Towerman a correr";
+  $("dlg-nova").showModal();
+}
+$("m-nova").onclick = () => abrirNovaSessao();
+$("form-nova").addEventListener("submit", async (e) => {
+  if (e.submitter && e.submitter.value === "cancelar") return;
+  e.preventDefault();
+  $("nova-criar").disabled = true;
+  $("nova-nota").textContent = "a criar a worktree e a arrancar…";
+  try {
+    const r = await enviarJSON("/v1/sessoes/nova", { raiz: $("nova-repo").value, base: $("nova-base").value.trim(), branch: $("nova-branch").value.trim(),
+      papel: $("nova-papel").value, tarefa: $("nova-tarefa").value, modo: $("nova-modo").value });
+    $("dlg-nova").close();
+    alertar("Sessão «" + r.nome + "» a arrancar em " + curto(r.worktree) + " (branch " + r.branch + ").");
+    setTimeout(() => carregarMapa(true), 1500);
+  } catch (err) { $("nova-nota").textContent = err.message; }
+  $("nova-criar").disabled = false;
+});
+
+async function carregarFluxos() {
+  const alvo = $("vista-fluxos");
+  try {
+    const fs = await pedir("/v1/fluxos");
+    alvo.replaceChildren();
+    if (!fs.length) {
+      alvo.append(el("div", { class: "vazio" }, "Ainda não há fluxos. No Mapa, usa «⇢ Ligar sessões»: clica na sessão que faz o trabalho e depois na que deve receber a resposta."));
+      return;
+    }
+    const rotulo = { ativo: "ativo", parado: "parado", limite: "limite de passos atingido" };
+    for (const f of fs) {
+      const acoes = el("span", { class: "acoes-fluxo" });
+      if (f.estado === "ativo") acoes.append(el("button", { onclick: () => mudarFluxo(f.id, { estado: "parado" }) }, "⏹ Parar"));
+      else acoes.append(el("button", { onclick: () => mudarFluxo(f.id, { estado: "ativo", max_passos: f.estado === "limite" ? f.max_passos + 5 : 0 }) },
+        f.estado === "limite" ? "▶ Retomar (+5 passos)" : "▶ Retomar"));
+      const arestas = el("div", { class: "arestas-lista" });
+      for (const a of f.arestas) {
+        arestas.append(el("div", { class: "aresta-linha" }, el("b", {}, a.nome_de || a.de.slice(0, 8)), el("span", { class: "seta-fluxo" }, "⇢"),
+          el("b", {}, a.nome_para || a.para.slice(0, 8)), el("small", {}, a.gatilho === "marca" ? "quando escrever «" + a.marca + "»" : "a cada passo"),
+          el("button", { onclick: async () => { try { await enviarJSON("/v1/fluxos/arestas/" + a.id + "/apagar", {}); carregarFluxos(); } catch (e) { alertar(e.message); } } }, "remover")));
+      }
+      const tempo = el("div", { class: "linha-tempo" });
+      for (const p of f.passagens) {
+        tempo.append(el("div", { class: "passagem " + p.estado },
+          el("div", {}, el("b", {}, (p.nome_de || p.de.slice(0, 8)) + " ⇢ " + (p.nome_para || p.para.slice(0, 8))), " ",
+            el("small", {}, ha(p.em) + " · " + (p.estado === "entregue" ? "entregue" : p.estado === "pendente" ? "em fila" : "falhou: " + p.motivo))),
+          el("details", {}, el("summary", {}, "ver o que passou"), el("pre", {}, p.texto))));
+      }
+      if (!f.passagens.length) tempo.append(el("div", { class: "branch" }, "Ainda nenhuma passagem."));
+      alvo.append(el("section", { class: "fluxo-cartao" },
+        el("header", {}, el("h3", {}, f.nome), el("span", { class: "fluxo-estado " + f.estado }, rotulo[f.estado] || f.estado),
+          el("small", { class: "branch" }, f.passos + " / " + f.max_passos + " passos"), acoes),
+        arestas, tempo));
+    }
+  } catch (e) { alvo.replaceChildren(el("div", { class: "branch" }, e.message)); }
+}
+async function mudarFluxo(id, corpo) {
+  try { await enviarJSON("/v1/fluxos/" + id + "/estado", corpo); } catch (e) { alertar(e.message); }
+  carregarFluxos();
+  carregarMapa();
+}
+
+$("todas").onchange = (e) => {
+  todas = e.target.checked;
+  try { localStorage.setItem("towerman.todas", todas ? "1" : "0"); } catch (err) {}
+  carregar();
+};
+
+function ligar() {
+  const vivo = $("vivo");
+  const fonte = new EventSource("/v1/ao-vivo");
+  fonte.onopen = () => { vivo.classList.add("ligado"); vivo.lastChild.textContent = "ao vivo"; carregar(); };
+  let espera = null;
+  fonte.addEventListener("mudou", () => {
+    carregar();
+    if (vistaAtual === "mapa") { clearTimeout(espera); espera = setTimeout(() => carregarMapa(), 400); }
+  });
+  fonte.onerror = () => { vivo.classList.remove("ligado"); vivo.lastChild.textContent = "a religar…"; };
+}
+
+carregar();
+ligar();
+ajustar();
+let vistaGuardada = null;
+try { vistaGuardada = localStorage.getItem("towerman.vista"); } catch (e) {}
+mostrar(vistas.includes(vistaGuardada) ? vistaGuardada : "mapa");
+setInterval(desenhar, 30000);
+</script>
+</body>
+</html>

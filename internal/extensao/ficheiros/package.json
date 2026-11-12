@@ -1,0 +1,15 @@
+{
+  "name": "towerman",
+  "publisher": "georgemyller",
+  "author": { "name": "George Myller" },
+  "displayName": "Towerman",
+  "description": "Liga os terminais do IDE ao Towerman: trazer o terminal de uma sessão para a frente e escrever nele a partir do painel.",
+  "version": "0.9.4",
+  "engines": { "vscode": "^1.80.0" },
+  "categories": ["Other"],
+  "activationEvents": ["onStartupFinished"],
+  "main": "./extension.js",
+  "extensionKind": ["ui", "workspace"],
+  "contributes": {},
+  "__metadata": { "publisherDisplayName": "George Myller" }
+}

@@ -1,0 +1,12 @@
+/towerman
+/towerman.exe
+/dist/
+
+# instalação local do Reversa
+/.agents/
+/.claude/
+/.reversa/
+/AGENTS.md
+/CLAUDE.md
+/GEMINI.md
+.DS_Store

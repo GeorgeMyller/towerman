@@ -1,0 +1,1252 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		0014B6EDBEA8B8043F7B9BD7 /* AgentDeckApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = B55D1222B965FBC9BD2F3B5A /* AgentDeckApp.swift */; };
+		0337BC16399ED5AFC39393BC /* MacNotifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CCA301EF148470787D3CF40 /* MacNotifier.swift */; };
+		03C23325745B129145094399 /* RelayCrypto.swift in Sources */ = {isa = PBXBuildFile; fileRef = A317F66EAF150FF721BE0E9E /* RelayCrypto.swift */; };
+		04484FD0338A7708323D0482 /* LaunchModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE00422990B888382D7FFFEE /* LaunchModels.swift */; };
+		083B131C58B1A4933C15B8BF /* RelayCrypto.swift in Sources */ = {isa = PBXBuildFile; fileRef = A317F66EAF150FF721BE0E9E /* RelayCrypto.swift */; };
+		0AA49CBE50D697212E6156DF /* TowermanIDs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 497F29C067F462A3846AB20B /* TowermanIDs.swift */; };
+		1373999CD89E7996090C0C11 /* LaunchModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE00422990B888382D7FFFEE /* LaunchModels.swift */; };
+		16E83A246F5B92C3D80536CB /* TowerSummary.swift in Sources */ = {isa = PBXBuildFile; fileRef = DED41AAFEFE6C3AB554CDA66 /* TowerSummary.swift */; };
+		18F7696BCDBFD6E4D85BD665 /* MetricsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD459F5536461D8E92B11300 /* MetricsView.swift */; };
+		1931703000B469FE66556F53 /* TowerSummary.swift in Sources */ = {isa = PBXBuildFile; fileRef = DED41AAFEFE6C3AB554CDA66 /* TowerSummary.swift */; };
+		19683943A4BCB63A31372270 /* AgentModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A5393BD3F07217F16C0747F /* AgentModels.swift */; };
+		1C07DE4E9FECF89F483DCF61 /* AgentModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A5393BD3F07217F16C0747F /* AgentModels.swift */; };
+		20D75E123DE5B429B8169652 /* TowerTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0393F56DA63094914823BBEC /* TowerTheme.swift */; };
+		239473E9F441742CC2F15C20 /* WatchViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F24B26C23B216D374F9B66A5 /* WatchViewModel.swift */; };
+		279A5C139E13E95DB9961841 /* BackgroundAudioKeeper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 62796CFCEB21A6BF75ECA5D3 /* BackgroundAudioKeeper.swift */; };
+		33189ADB55B94FECF04D8ADE /* DeckView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DE821C72F37C82A7C5C58B2 /* DeckView.swift */; };
+		3333CBF678D91F07F0250895 /* TowermanMacApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6A4454CB7F5187CA310492A /* TowermanMacApp.swift */; };
+		3462F3D2622FA8EF9E4D7F5A /* NovaTarefaView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0DEB65C6E02CECACF53BC6B /* NovaTarefaView.swift */; };
+		37B734E1957BBBD33182BDBD /* TowerSummary.swift in Sources */ = {isa = PBXBuildFile; fileRef = DED41AAFEFE6C3AB554CDA66 /* TowerSummary.swift */; };
+		3883F6C63A88675EEA87DC6D /* TowerIntents.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD3ED50F7684406126F1E803 /* TowerIntents.swift */; };
+		45867B3483AF4EFA1A844D20 /* SwipeActions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 217297DCA36693DF325C19C1 /* SwipeActions.swift */; };
+		48F943480354C32C467C7765 /* MetricsModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5C9E3D8E2FB95EDF558C00A /* MetricsModels.swift */; };
+		4992982944F67B9304A923C5 /* TowerActivityAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = D523FC39457CB28E9AED0910 /* TowerActivityAttributes.swift */; };
+		4E9559EA9A1B415B1C3A5629 /* WatchSyncPolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = E740281D3DB66BC3C21EE220 /* WatchSyncPolicy.swift */; };
+		5276064DA9A3503187CB6DDE /* PromptNotifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15642838359CD4768E056AD8 /* PromptNotifier.swift */; };
+		56F7EAD63F23A15D8B7B968C /* TowerTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0393F56DA63094914823BBEC /* TowerTheme.swift */; };
+		5C0B79ADD7FE550B5079EE7B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7F2096373957C3C263CBB74E /* Assets.xcassets */; };
+		5E3F6BE962F6AF61BD5F3A56 /* QuickReplies.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17EB93C38D508325AE817677 /* QuickReplies.swift */; };
+		642FC41A22AD61B540BC2193 /* TowermanNotificationService.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = B1BD536C821970A69C384446 /* TowermanNotificationService.appex */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		6792184C4B4AC35630A04F69 /* TowermanIDs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 497F29C067F462A3846AB20B /* TowermanIDs.swift */; };
+		681464361D001651B77DC536 /* SwipeActions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 217297DCA36693DF325C19C1 /* SwipeActions.swift */; };
+		686E1E72BBA3AF83B82632AA /* RelayCrypto.swift in Sources */ = {isa = PBXBuildFile; fileRef = A317F66EAF150FF721BE0E9E /* RelayCrypto.swift */; };
+		69C54D67A1B75336168A5904 /* MacNovaTarefa.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01FBA7366F7D7BE3C9894DB7 /* MacNovaTarefa.swift */; };
+		6CE466F14FC4C91647F65F4E /* QuickReplies.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17EB93C38D508325AE817677 /* QuickReplies.swift */; };
+		6E52ACCD9934A678E878A7CC /* DecisionNotification.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63F4333820EE82C67831B299 /* DecisionNotification.swift */; };
+		6F25C6F4A06936ADF7011660 /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 764EA813454307AE5FFDF9D6 /* NotificationService.swift */; };
+		71327E9C881AD46B71AB70E3 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B020B4F7F46B5A2DE6B64422 /* Assets.xcassets */; };
+		7665B14E710F0022C03F24CD /* TowermanWatch.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 2BF44929C85174600DC6AEBE /* TowermanWatch.app */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		7B3F93E94EB3FC9C18275C83 /* RelayCrypto.swift in Sources */ = {isa = PBXBuildFile; fileRef = A317F66EAF150FF721BE0E9E /* RelayCrypto.swift */; };
+		7BBEF0ED8B81B2CED2D023B0 /* AgentDeckWatchApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7BC4531B852B6B8DE5F86C8 /* AgentDeckWatchApp.swift */; };
+		7E20EDDC53F3442712DB6551 /* TowermanWatchWidgets.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 932586446CF5976A34D02FEF /* TowermanWatchWidgets.appex */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		82393438C9593CA555E74E82 /* TowerIntents.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD3ED50F7684406126F1E803 /* TowerIntents.swift */; };
+		823A093D84FA53C3D6DB2290 /* LaunchModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE00422990B888382D7FFFEE /* LaunchModels.swift */; };
+		83AE548863713EE4FDED06A7 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55DB55F679211EC760754B24 /* ContentView.swift */; };
+		83CF45200D3F33E2DF5883E4 /* TowermanLive.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 1FF174A3C983691238D08304 /* TowermanLive.appex */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		856A10339C4F5400048A5B2B /* AgentModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A5393BD3F07217F16C0747F /* AgentModels.swift */; };
+		85BE37FD7F737609D588C962 /* ServerManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D58DA5CF6CCDE2E7769AFD41 /* ServerManager.swift */; };
+		89A48ABAF6F68C0DB31D7E37 /* WatchSyncPolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = E740281D3DB66BC3C21EE220 /* WatchSyncPolicy.swift */; };
+		8A0A67DE0BBD70902579E75A /* TowerShortcuts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A3362AA05C3682CAC7A15AB /* TowerShortcuts.swift */; };
+		8B9FC1FA86705BAC7C84FE85 /* RelayCrypto.swift in Sources */ = {isa = PBXBuildFile; fileRef = A317F66EAF150FF721BE0E9E /* RelayCrypto.swift */; };
+		9292C4B1199934DD982E33D2 /* QuickReplies.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17EB93C38D508325AE817677 /* QuickReplies.swift */; };
+		978A6FF9DB1E34D1DBBD51A5 /* TowermanIDs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 497F29C067F462A3846AB20B /* TowermanIDs.swift */; };
+		98A64022C64A39ED028ED724 /* TowerSummary.swift in Sources */ = {isa = PBXBuildFile; fileRef = DED41AAFEFE6C3AB554CDA66 /* TowerSummary.swift */; };
+		99939DE83ECDE4DC041268FF /* TowerTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0393F56DA63094914823BBEC /* TowerTheme.swift */; };
+		9FB6D86F0C85DB289996A406 /* AgentDeckBridgeManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F090444368AF151E5FE3C6DC /* AgentDeckBridgeManager.swift */; };
+		A5A64341F3EA1C90D03992E6 /* RelayCrypto.swift in Sources */ = {isa = PBXBuildFile; fileRef = A317F66EAF150FF721BE0E9E /* RelayCrypto.swift */; };
+		A87E589517BEE013ABA68191 /* TowermanIDs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 497F29C067F462A3846AB20B /* TowermanIDs.swift */; };
+		A9CA7FF47931A3CFEDF2FE32 /* TowerActivityController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57A5F4FE8CC7CB5DC20674F6 /* TowerActivityController.swift */; };
+		ACBA966C243A625D341161EB /* SwipeActions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 217297DCA36693DF325C19C1 /* SwipeActions.swift */; };
+		AFB58619D0D1078234AE5104 /* DecisionNotification.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63F4333820EE82C67831B299 /* DecisionNotification.swift */; };
+		BB27C8B7F39D67AD5E28D0A8 /* LaunchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6793BCA55EDD58526094870 /* LaunchView.swift */; };
+		BDC59D99F4FCD09811A196F6 /* TowermanIDs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 497F29C067F462A3846AB20B /* TowermanIDs.swift */; };
+		BF4F9192207318DE38AB9502 /* TowerActivityAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = D523FC39457CB28E9AED0910 /* TowerActivityAttributes.swift */; };
+		C0BB7F2AE7AEC7EFACF5E4EC /* DeckStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35AED3E8CFD4B725D68672CA /* DeckStore.swift */; };
+		C2528BFBE931375FF2D9DB72 /* AgentModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A5393BD3F07217F16C0747F /* AgentModels.swift */; };
+		C33841681F5012A927AABAF4 /* QuickReplies.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17EB93C38D508325AE817677 /* QuickReplies.swift */; };
+		C66CDD49908559ED41172A54 /* SwipeActions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 217297DCA36693DF325C19C1 /* SwipeActions.swift */; };
+		C780A1068EE98378EE029FEB /* TowerLiveActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF770EA45DDA770B75881B80 /* TowerLiveActivity.swift */; };
+		D1C24ABD8AE50AF3C6D402B2 /* QuickReplies.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17EB93C38D508325AE817677 /* QuickReplies.swift */; };
+		D222A9403C6D0B7149027EC3 /* ServerLink.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6ED944F776ABD36272D770E /* ServerLink.swift */; };
+		D3A982FA80700FD7FDA80403 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 54C78BE294569035D7EA0216 /* Assets.xcassets */; };
+		D47ACA426627A41640019D3C /* WatchSyncPolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = E740281D3DB66BC3C21EE220 /* WatchSyncPolicy.swift */; };
+		D5883E26DD6488EEAAA18BE6 /* SwipeActions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 217297DCA36693DF325C19C1 /* SwipeActions.swift */; };
+		DA228F663C56238B2B63DEB2 /* TowermanIDs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 497F29C067F462A3846AB20B /* TowermanIDs.swift */; };
+		E04E2D5AF9440A9012A46E2F /* LaunchModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE00422990B888382D7FFFEE /* LaunchModels.swift */; };
+		E08492A6B48DB164BEC47691 /* LaunchModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE00422990B888382D7FFFEE /* LaunchModels.swift */; };
+		E235D489D775997A24324B2A /* TowerWidgets.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3291685D91D70ED31E0B6C40 /* TowerWidgets.swift */; };
+		ED583C904388969A70CBEA67 /* WatchSyncPolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = E740281D3DB66BC3C21EE220 /* WatchSyncPolicy.swift */; };
+		ED6441CBEC82351807A8367F /* AgentModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A5393BD3F07217F16C0747F /* AgentModels.swift */; };
+		EF4ABA2D4B8A8EA057A506FF /* TowerTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0393F56DA63094914823BBEC /* TowerTheme.swift */; };
+		F01F946A8EA0515AEB75397E /* ServerLink.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6ED944F776ABD36272D770E /* ServerLink.swift */; };
+		F7110823830D35F2D67AE04A /* WatchContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50C37AB40684AA4281D9A99D /* WatchContentView.swift */; };
+		FD08539B1ED14B45252BB3AA /* TowerTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0393F56DA63094914823BBEC /* TowerTheme.swift */; };
+		FF0C0FD8C17040A06287DB70 /* AgentModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A5393BD3F07217F16C0747F /* AgentModels.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		33F7812C52AAEB51CB53AEBE /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 26C6D1719449FA30298DC067 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = CF2863B1676676BE85E19549;
+			remoteInfo = TowermanWatch;
+		};
+		5811702AE27C834ADDF8EC18 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 26C6D1719449FA30298DC067 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = DF67F4007ACF00F4FFCF5602;
+			remoteInfo = TowermanWatchWidgets;
+		};
+		6AF8878DD32C1AD1EB160D21 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 26C6D1719449FA30298DC067 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = C9D5731B31B9323509A5FC80;
+			remoteInfo = TowermanLive;
+		};
+		C41620BEF208139BB07B6CDB /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 26C6D1719449FA30298DC067 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 0D4B0E68D5B8D92B9B795AEB;
+			remoteInfo = TowermanNotificationService;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		1371E9B80C0B33C231864434 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				7E20EDDC53F3442712DB6551 /* TowermanWatchWidgets.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		2E9B53B885B6E20C1ECF9077 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				83CF45200D3F33E2DF5883E4 /* TowermanLive.appex in Embed Foundation Extensions */,
+				642FC41A22AD61B540BC2193 /* TowermanNotificationService.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		54178EC901400B6F0B4F2D7D /* Embed Watch Content */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "$(CONTENTS_FOLDER_PATH)/Watch";
+			dstSubfolderSpec = 16;
+			files = (
+				7665B14E710F0022C03F24CD /* TowermanWatch.app in Embed Watch Content */,
+			);
+			name = "Embed Watch Content";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		01FBA7366F7D7BE3C9894DB7 /* MacNovaTarefa.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacNovaTarefa.swift; sourceTree = "<group>"; };
+		0393F56DA63094914823BBEC /* TowerTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TowerTheme.swift; sourceTree = "<group>"; };
+		0A3362AA05C3682CAC7A15AB /* TowerShortcuts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TowerShortcuts.swift; sourceTree = "<group>"; };
+		15642838359CD4768E056AD8 /* PromptNotifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromptNotifier.swift; sourceTree = "<group>"; };
+		17EB93C38D508325AE817677 /* QuickReplies.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuickReplies.swift; sourceTree = "<group>"; };
+		1A5393BD3F07217F16C0747F /* AgentModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentModels.swift; sourceTree = "<group>"; };
+		1FF174A3C983691238D08304 /* TowermanLive.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = TowermanLive.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		2084BC0383CAE6FF9951DDEF /* Towerman.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Towerman.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		217297DCA36693DF325C19C1 /* SwipeActions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwipeActions.swift; sourceTree = "<group>"; };
+		2BF44929C85174600DC6AEBE /* TowermanWatch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TowermanWatch.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		3291685D91D70ED31E0B6C40 /* TowerWidgets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TowerWidgets.swift; sourceTree = "<group>"; };
+		35AED3E8CFD4B725D68672CA /* DeckStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeckStore.swift; sourceTree = "<group>"; };
+		4284A7EC41BF37169BC00F99 /* TowermanMac.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TowermanMac.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		497F29C067F462A3846AB20B /* TowermanIDs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TowermanIDs.swift; sourceTree = "<group>"; };
+		4DE821C72F37C82A7C5C58B2 /* DeckView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeckView.swift; sourceTree = "<group>"; };
+		50C37AB40684AA4281D9A99D /* WatchContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchContentView.swift; sourceTree = "<group>"; };
+		54C78BE294569035D7EA0216 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		55DB55F679211EC760754B24 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		57A5F4FE8CC7CB5DC20674F6 /* TowerActivityController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TowerActivityController.swift; sourceTree = "<group>"; };
+		5B3A81948DC6966C5B5845E7 /* TowermanNotificationService.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = TowermanNotificationService.entitlements; sourceTree = "<group>"; };
+		5CCA301EF148470787D3CF40 /* MacNotifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacNotifier.swift; sourceTree = "<group>"; };
+		62796CFCEB21A6BF75ECA5D3 /* BackgroundAudioKeeper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundAudioKeeper.swift; sourceTree = "<group>"; };
+		63F4333820EE82C67831B299 /* DecisionNotification.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DecisionNotification.swift; sourceTree = "<group>"; };
+		69B1B8C3FBA49B5493B793A0 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		6B001AC486DA3CFCFB6162D8 /* Towerman.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Towerman.xcconfig; sourceTree = "<group>"; };
+		764EA813454307AE5FFDF9D6 /* NotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
+		7F2096373957C3C263CBB74E /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		8811B83540274A17BF0387BE /* TowermanWatchWidgets.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = TowermanWatchWidgets.entitlements; sourceTree = "<group>"; };
+		932586446CF5976A34D02FEF /* TowermanWatchWidgets.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = TowermanWatchWidgets.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		9A125643A6A798E80C80B841 /* Towerman.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Towerman.entitlements; sourceTree = "<group>"; };
+		A317F66EAF150FF721BE0E9E /* RelayCrypto.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RelayCrypto.swift; sourceTree = "<group>"; };
+		A377B388653A9BBB7BEAC098 /* TowermanWatch.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = TowermanWatch.entitlements; sourceTree = "<group>"; };
+		AD3ED50F7684406126F1E803 /* TowerIntents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TowerIntents.swift; sourceTree = "<group>"; };
+		B020B4F7F46B5A2DE6B64422 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		B1BD536C821970A69C384446 /* TowermanNotificationService.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = TowermanNotificationService.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		B55D1222B965FBC9BD2F3B5A /* AgentDeckApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentDeckApp.swift; sourceTree = "<group>"; };
+		BD459F5536461D8E92B11300 /* MetricsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetricsView.swift; sourceTree = "<group>"; };
+		C30F71A598EC83D623592AE8 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		C5C9E3D8E2FB95EDF558C00A /* MetricsModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetricsModels.swift; sourceTree = "<group>"; };
+		D523FC39457CB28E9AED0910 /* TowerActivityAttributes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TowerActivityAttributes.swift; sourceTree = "<group>"; };
+		D58DA5CF6CCDE2E7769AFD41 /* ServerManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServerManager.swift; sourceTree = "<group>"; };
+		D6ED944F776ABD36272D770E /* ServerLink.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServerLink.swift; sourceTree = "<group>"; };
+		DED41AAFEFE6C3AB554CDA66 /* TowerSummary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TowerSummary.swift; sourceTree = "<group>"; };
+		E0DEB65C6E02CECACF53BC6B /* NovaTarefaView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NovaTarefaView.swift; sourceTree = "<group>"; };
+		E740281D3DB66BC3C21EE220 /* WatchSyncPolicy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchSyncPolicy.swift; sourceTree = "<group>"; };
+		EF770EA45DDA770B75881B80 /* TowerLiveActivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TowerLiveActivity.swift; sourceTree = "<group>"; };
+		F090444368AF151E5FE3C6DC /* AgentDeckBridgeManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentDeckBridgeManager.swift; sourceTree = "<group>"; };
+		F24B26C23B216D374F9B66A5 /* WatchViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchViewModel.swift; sourceTree = "<group>"; };
+		F6793BCA55EDD58526094870 /* LaunchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaunchView.swift; sourceTree = "<group>"; };
+		F6A4454CB7F5187CA310492A /* TowermanMacApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TowermanMacApp.swift; sourceTree = "<group>"; };
+		F7BC4531B852B6B8DE5F86C8 /* AgentDeckWatchApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentDeckWatchApp.swift; sourceTree = "<group>"; };
+		FE00422990B888382D7FFFEE /* LaunchModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaunchModels.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		130E2044B9DD5A3C14737529 /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				1A5393BD3F07217F16C0747F /* AgentModels.swift */,
+				FE00422990B888382D7FFFEE /* LaunchModels.swift */,
+				17EB93C38D508325AE817677 /* QuickReplies.swift */,
+				A317F66EAF150FF721BE0E9E /* RelayCrypto.swift */,
+				217297DCA36693DF325C19C1 /* SwipeActions.swift */,
+				497F29C067F462A3846AB20B /* TowermanIDs.swift */,
+				DED41AAFEFE6C3AB554CDA66 /* TowerSummary.swift */,
+				0393F56DA63094914823BBEC /* TowerTheme.swift */,
+				E740281D3DB66BC3C21EE220 /* WatchSyncPolicy.swift */,
+			);
+			path = Shared;
+			sourceTree = "<group>";
+		};
+		14724450F07AF6D0B256CAF5 /* LiveActivity */ = {
+			isa = PBXGroup;
+			children = (
+				69B1B8C3FBA49B5493B793A0 /* Info.plist */,
+				D523FC39457CB28E9AED0910 /* TowerActivityAttributes.swift */,
+				EF770EA45DDA770B75881B80 /* TowerLiveActivity.swift */,
+			);
+			path = LiveActivity;
+			sourceTree = "<group>";
+		};
+		223677CA72A5E9F280AA1924 /* Mac */ = {
+			isa = PBXGroup;
+			children = (
+				7F2096373957C3C263CBB74E /* Assets.xcassets */,
+				35AED3E8CFD4B725D68672CA /* DeckStore.swift */,
+				4DE821C72F37C82A7C5C58B2 /* DeckView.swift */,
+				5CCA301EF148470787D3CF40 /* MacNotifier.swift */,
+				01FBA7366F7D7BE3C9894DB7 /* MacNovaTarefa.swift */,
+				C5C9E3D8E2FB95EDF558C00A /* MetricsModels.swift */,
+				BD459F5536461D8E92B11300 /* MetricsView.swift */,
+				D58DA5CF6CCDE2E7769AFD41 /* ServerManager.swift */,
+				F6A4454CB7F5187CA310492A /* TowermanMacApp.swift */,
+			);
+			path = Mac;
+			sourceTree = "<group>";
+		};
+		27ECEFFD2B7FEA8F5225118E /* WatchApp */ = {
+			isa = PBXGroup;
+			children = (
+				F7BC4531B852B6B8DE5F86C8 /* AgentDeckWatchApp.swift */,
+				B020B4F7F46B5A2DE6B64422 /* Assets.xcassets */,
+				F6793BCA55EDD58526094870 /* LaunchView.swift */,
+				A377B388653A9BBB7BEAC098 /* TowermanWatch.entitlements */,
+				0A3362AA05C3682CAC7A15AB /* TowerShortcuts.swift */,
+				50C37AB40684AA4281D9A99D /* WatchContentView.swift */,
+				F24B26C23B216D374F9B66A5 /* WatchViewModel.swift */,
+			);
+			path = WatchApp;
+			sourceTree = "<group>";
+		};
+		2A203203F7B301DDE9B24533 /* NotificationService */ = {
+			isa = PBXGroup;
+			children = (
+				764EA813454307AE5FFDF9D6 /* NotificationService.swift */,
+				5B3A81948DC6966C5B5845E7 /* TowermanNotificationService.entitlements */,
+			);
+			path = NotificationService;
+			sourceTree = "<group>";
+		};
+		4D612A3887B7643EAF7BA4EC = {
+			isa = PBXGroup;
+			children = (
+				A0B67986CEE5D0E66106F990 /* Config */,
+				5FC636D3B1013F7C1A305F70 /* iOS */,
+				14724450F07AF6D0B256CAF5 /* LiveActivity */,
+				223677CA72A5E9F280AA1924 /* Mac */,
+				2A203203F7B301DDE9B24533 /* NotificationService */,
+				130E2044B9DD5A3C14737529 /* Shared */,
+				27ECEFFD2B7FEA8F5225118E /* WatchApp */,
+				542C146EA8067A8BD2B0A15F /* WatchWidgets */,
+				532E523E509AAA54EEC46A1E /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		532E523E509AAA54EEC46A1E /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				2084BC0383CAE6FF9951DDEF /* Towerman.app */,
+				1FF174A3C983691238D08304 /* TowermanLive.appex */,
+				4284A7EC41BF37169BC00F99 /* TowermanMac.app */,
+				B1BD536C821970A69C384446 /* TowermanNotificationService.appex */,
+				2BF44929C85174600DC6AEBE /* TowermanWatch.app */,
+				932586446CF5976A34D02FEF /* TowermanWatchWidgets.appex */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		542C146EA8067A8BD2B0A15F /* WatchWidgets */ = {
+			isa = PBXGroup;
+			children = (
+				C30F71A598EC83D623592AE8 /* Info.plist */,
+				AD3ED50F7684406126F1E803 /* TowerIntents.swift */,
+				8811B83540274A17BF0387BE /* TowermanWatchWidgets.entitlements */,
+				3291685D91D70ED31E0B6C40 /* TowerWidgets.swift */,
+			);
+			path = WatchWidgets;
+			sourceTree = "<group>";
+		};
+		5FC636D3B1013F7C1A305F70 /* iOS */ = {
+			isa = PBXGroup;
+			children = (
+				B55D1222B965FBC9BD2F3B5A /* AgentDeckApp.swift */,
+				F090444368AF151E5FE3C6DC /* AgentDeckBridgeManager.swift */,
+				54C78BE294569035D7EA0216 /* Assets.xcassets */,
+				62796CFCEB21A6BF75ECA5D3 /* BackgroundAudioKeeper.swift */,
+				55DB55F679211EC760754B24 /* ContentView.swift */,
+				63F4333820EE82C67831B299 /* DecisionNotification.swift */,
+				E0DEB65C6E02CECACF53BC6B /* NovaTarefaView.swift */,
+				15642838359CD4768E056AD8 /* PromptNotifier.swift */,
+				D6ED944F776ABD36272D770E /* ServerLink.swift */,
+				57A5F4FE8CC7CB5DC20674F6 /* TowerActivityController.swift */,
+				9A125643A6A798E80C80B841 /* Towerman.entitlements */,
+			);
+			path = iOS;
+			sourceTree = "<group>";
+		};
+		A0B67986CEE5D0E66106F990 /* Config */ = {
+			isa = PBXGroup;
+			children = (
+				6B001AC486DA3CFCFB6162D8 /* Towerman.xcconfig */,
+			);
+			path = Config;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		0D4B0E68D5B8D92B9B795AEB /* TowermanNotificationService */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 62D133A8CCA9BD285F7B4CB4 /* Build configuration list for PBXNativeTarget "TowermanNotificationService" */;
+			buildPhases = (
+				01B771ABA29A61A921B3EA48 /* Sources */,
+				61C1F9164833CACDB143945D /* Número de build */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = TowermanNotificationService;
+			packageProductDependencies = (
+			);
+			productName = TowermanNotificationService;
+			productReference = B1BD536C821970A69C384446 /* TowermanNotificationService.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+		20DD514073519028590126FE /* Towerman */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = FEDB18562B0693F35638E719 /* Build configuration list for PBXNativeTarget "Towerman" */;
+			buildPhases = (
+				B4D026F405808F86131F546B /* Sources */,
+				9C9B63E8FACF261CC05E7B9C /* Resources */,
+				2E9B53B885B6E20C1ECF9077 /* Embed Foundation Extensions */,
+				54178EC901400B6F0B4F2D7D /* Embed Watch Content */,
+				FB210763C5C557C14165B15A /* Número de build */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				D39D868F8A4B5CACF4D9E286 /* PBXTargetDependency */,
+				9BF7028611C70850BCE35923 /* PBXTargetDependency */,
+				36464C0C231042E16AF05C63 /* PBXTargetDependency */,
+			);
+			name = Towerman;
+			packageProductDependencies = (
+			);
+			productName = Towerman;
+			productReference = 2084BC0383CAE6FF9951DDEF /* Towerman.app */;
+			productType = "com.apple.product-type.application";
+		};
+		B0E4FED3B06EB5BCBE92FA99 /* TowermanMac */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 82B923C0A4CAFBA409D7E286 /* Build configuration list for PBXNativeTarget "TowermanMac" */;
+			buildPhases = (
+				962630EDBEF064173BE1FC05 /* Sources */,
+				22B9A958E27FB4D3D503E68B /* Servidor Towerman dentro do app */,
+				D6F53AAB4F9A481B67CB13AA /* Resources */,
+				82CA94C47B3F432FA5000D0A /* Número de build */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = TowermanMac;
+			packageProductDependencies = (
+			);
+			productName = TowermanMac;
+			productReference = 4284A7EC41BF37169BC00F99 /* TowermanMac.app */;
+			productType = "com.apple.product-type.application";
+		};
+		C9D5731B31B9323509A5FC80 /* TowermanLive */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = DD4BF3242B405EF78B135180 /* Build configuration list for PBXNativeTarget "TowermanLive" */;
+			buildPhases = (
+				A5751AA0D7A51D669E8FBD43 /* Sources */,
+				8DC234CB4FDBE91FB25CDFD1 /* Número de build */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = TowermanLive;
+			packageProductDependencies = (
+			);
+			productName = TowermanLive;
+			productReference = 1FF174A3C983691238D08304 /* TowermanLive.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+		CF2863B1676676BE85E19549 /* TowermanWatch */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 56CEA9F943A704FC69918CB7 /* Build configuration list for PBXNativeTarget "TowermanWatch" */;
+			buildPhases = (
+				C54B535BAD1CCAA96AD17598 /* Sources */,
+				2AE9013D5FD5037CEFF31DDE /* Resources */,
+				1371E9B80C0B33C231864434 /* Embed Foundation Extensions */,
+				685B3222785FCAB3ABE2C40E /* Número de build */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				A18AE4EA5D911E744D2FD7B3 /* PBXTargetDependency */,
+			);
+			name = TowermanWatch;
+			packageProductDependencies = (
+			);
+			productName = TowermanWatch;
+			productReference = 2BF44929C85174600DC6AEBE /* TowermanWatch.app */;
+			productType = "com.apple.product-type.application";
+		};
+		DF67F4007ACF00F4FFCF5602 /* TowermanWatchWidgets */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = F9CCE88B1B0C57F236E008BE /* Build configuration list for PBXNativeTarget "TowermanWatchWidgets" */;
+			buildPhases = (
+				AECB062A97BBB0B65B16069F /* Sources */,
+				FBF4741B8DE49790481B00C6 /* Número de build */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = TowermanWatchWidgets;
+			packageProductDependencies = (
+			);
+			productName = TowermanWatchWidgets;
+			productReference = 932586446CF5976A34D02FEF /* TowermanWatchWidgets.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		26C6D1719449FA30298DC067 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+					0D4B0E68D5B8D92B9B795AEB = {
+						DevelopmentTeam = "$(TOWERMAN_TEAM_ID)";
+						ProvisioningStyle = Automatic;
+					};
+					20DD514073519028590126FE = {
+						DevelopmentTeam = "$(TOWERMAN_TEAM_ID)";
+						ProvisioningStyle = Automatic;
+					};
+					B0E4FED3B06EB5BCBE92FA99 = {
+						DevelopmentTeam = "$(TOWERMAN_TEAM_ID)";
+						ProvisioningStyle = Automatic;
+					};
+					C9D5731B31B9323509A5FC80 = {
+						DevelopmentTeam = "$(TOWERMAN_TEAM_ID)";
+						ProvisioningStyle = Automatic;
+					};
+					CF2863B1676676BE85E19549 = {
+						DevelopmentTeam = "$(TOWERMAN_TEAM_ID)";
+						ProvisioningStyle = Automatic;
+					};
+					DF67F4007ACF00F4FFCF5602 = {
+						DevelopmentTeam = "$(TOWERMAN_TEAM_ID)";
+						ProvisioningStyle = Automatic;
+					};
+				};
+			};
+			buildConfigurationList = 17030B38FFD83B195A8DA850 /* Build configuration list for PBXProject "Towerman" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = 4D612A3887B7643EAF7BA4EC;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 532E523E509AAA54EEC46A1E /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				20DD514073519028590126FE /* Towerman */,
+				CF2863B1676676BE85E19549 /* TowermanWatch */,
+				C9D5731B31B9323509A5FC80 /* TowermanLive */,
+				0D4B0E68D5B8D92B9B795AEB /* TowermanNotificationService */,
+				DF67F4007ACF00F4FFCF5602 /* TowermanWatchWidgets */,
+				B0E4FED3B06EB5BCBE92FA99 /* TowermanMac */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		2AE9013D5FD5037CEFF31DDE /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				71327E9C881AD46B71AB70E3 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		9C9B63E8FACF261CC05E7B9C /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D3A982FA80700FD7FDA80403 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D6F53AAB4F9A481B67CB13AA /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5C0B79ADD7FE550B5079EE7B /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		22B9A958E27FB4D3D503E68B /* Servidor Towerman dentro do app */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Servidor Towerman dentro do app";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Compila o towerman (repositório ao lado, ou TOWERMAN_SRC) para dentro do app e assina-o.\nset -e\nSRC=\"${TOWERMAN_SRC:-$SRCROOT/..}\"\nexport PATH=\"/opt/homebrew/bin:/usr/local/go/bin:/usr/local/bin:$PATH\"\nif [ ! -f \"$SRC/go.mod\" ] || ! command -v go >/dev/null; then\n  echo \"warning: towerman não compilado (sem $SRC ou sem go); o app usa o servidor que houver\"\n  exit 0\nfi\nDEST=\"$TARGET_BUILD_DIR/$EXECUTABLE_FOLDER_PATH/towerman-cli\"\n# Universal (arm64 + x86_64), como o app: o DMG também serve para os Mac Intel.\nfor ARCH in arm64 amd64; do\n  (cd \"$SRC\" && CGO_ENABLED=0 GOOS=darwin GOARCH=$ARCH go build -trimpath -o \"$DERIVED_FILE_DIR/towerman-$ARCH\" ./cmd/towerman)\ndone\nlipo -create -output \"$DEST\" \"$DERIVED_FILE_DIR/towerman-arm64\" \"$DERIVED_FILE_DIR/towerman-amd64\"\nif [ \"$CODE_SIGNING_ALLOWED\" = \"YES\" ] && [ -n \"$EXPANDED_CODE_SIGN_IDENTITY\" ]; then\n  codesign --force --sign \"$EXPANDED_CODE_SIGN_IDENTITY\" --timestamp=none \"$DEST\"\nfi\n";
+		};
+		61C1F9164833CACDB143945D /* Número de build */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"$(TARGET_BUILD_DIR)/$(INFOPLIST_PATH)",
+			);
+			name = "Número de build";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Número de build = commits do repositório; o app e as extensões ficam com o mesmo.\nN=$(git -C \"$SRCROOT\" rev-list --count HEAD 2>/dev/null || echo 1)\n/usr/libexec/PlistBuddy -c \"Set :CFBundleVersion $N\" \"$TARGET_BUILD_DIR/$INFOPLIST_PATH\"\n";
+		};
+		685B3222785FCAB3ABE2C40E /* Número de build */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"$(TARGET_BUILD_DIR)/$(INFOPLIST_PATH)",
+			);
+			name = "Número de build";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Número de build = commits do repositório; o app e as extensões ficam com o mesmo.\nN=$(git -C \"$SRCROOT\" rev-list --count HEAD 2>/dev/null || echo 1)\n/usr/libexec/PlistBuddy -c \"Set :CFBundleVersion $N\" \"$TARGET_BUILD_DIR/$INFOPLIST_PATH\"\n";
+		};
+		82CA94C47B3F432FA5000D0A /* Número de build */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"$(TARGET_BUILD_DIR)/$(INFOPLIST_PATH)",
+			);
+			name = "Número de build";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Número de build = commits do repositório; o app e as extensões ficam com o mesmo.\nN=$(git -C \"$SRCROOT\" rev-list --count HEAD 2>/dev/null || echo 1)\n/usr/libexec/PlistBuddy -c \"Set :CFBundleVersion $N\" \"$TARGET_BUILD_DIR/$INFOPLIST_PATH\"\n";
+		};
+		8DC234CB4FDBE91FB25CDFD1 /* Número de build */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"$(TARGET_BUILD_DIR)/$(INFOPLIST_PATH)",
+			);
+			name = "Número de build";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Número de build = commits do repositório; o app e as extensões ficam com o mesmo.\nN=$(git -C \"$SRCROOT\" rev-list --count HEAD 2>/dev/null || echo 1)\n/usr/libexec/PlistBuddy -c \"Set :CFBundleVersion $N\" \"$TARGET_BUILD_DIR/$INFOPLIST_PATH\"\n";
+		};
+		FB210763C5C557C14165B15A /* Número de build */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"$(TARGET_BUILD_DIR)/$(INFOPLIST_PATH)",
+			);
+			name = "Número de build";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Número de build = commits do repositório; o app e as extensões ficam com o mesmo.\nN=$(git -C \"$SRCROOT\" rev-list --count HEAD 2>/dev/null || echo 1)\n/usr/libexec/PlistBuddy -c \"Set :CFBundleVersion $N\" \"$TARGET_BUILD_DIR/$INFOPLIST_PATH\"\n";
+		};
+		FBF4741B8DE49790481B00C6 /* Número de build */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"$(TARGET_BUILD_DIR)/$(INFOPLIST_PATH)",
+			);
+			name = "Número de build";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Número de build = commits do repositório; o app e as extensões ficam com o mesmo.\nN=$(git -C \"$SRCROOT\" rev-list --count HEAD 2>/dev/null || echo 1)\n/usr/libexec/PlistBuddy -c \"Set :CFBundleVersion $N\" \"$TARGET_BUILD_DIR/$INFOPLIST_PATH\"\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		01B771ABA29A61A921B3EA48 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				ED6441CBEC82351807A8367F /* AgentModels.swift in Sources */,
+				AFB58619D0D1078234AE5104 /* DecisionNotification.swift in Sources */,
+				6F25C6F4A06936ADF7011660 /* NotificationService.swift in Sources */,
+				7B3F93E94EB3FC9C18275C83 /* RelayCrypto.swift in Sources */,
+				6792184C4B4AC35630A04F69 /* TowermanIDs.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		962630EDBEF064173BE1FC05 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				19683943A4BCB63A31372270 /* AgentModels.swift in Sources */,
+				C0BB7F2AE7AEC7EFACF5E4EC /* DeckStore.swift in Sources */,
+				33189ADB55B94FECF04D8ADE /* DeckView.swift in Sources */,
+				04484FD0338A7708323D0482 /* LaunchModels.swift in Sources */,
+				0337BC16399ED5AFC39393BC /* MacNotifier.swift in Sources */,
+				69C54D67A1B75336168A5904 /* MacNovaTarefa.swift in Sources */,
+				48F943480354C32C467C7765 /* MetricsModels.swift in Sources */,
+				18F7696BCDBFD6E4D85BD665 /* MetricsView.swift in Sources */,
+				9292C4B1199934DD982E33D2 /* QuickReplies.swift in Sources */,
+				083B131C58B1A4933C15B8BF /* RelayCrypto.swift in Sources */,
+				D222A9403C6D0B7149027EC3 /* ServerLink.swift in Sources */,
+				85BE37FD7F737609D588C962 /* ServerManager.swift in Sources */,
+				C66CDD49908559ED41172A54 /* SwipeActions.swift in Sources */,
+				56F7EAD63F23A15D8B7B968C /* TowerTheme.swift in Sources */,
+				BDC59D99F4FCD09811A196F6 /* TowermanIDs.swift in Sources */,
+				3333CBF678D91F07F0250895 /* TowermanMacApp.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A5751AA0D7A51D669E8FBD43 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				856A10339C4F5400048A5B2B /* AgentModels.swift in Sources */,
+				E08492A6B48DB164BEC47691 /* LaunchModels.swift in Sources */,
+				5E3F6BE962F6AF61BD5F3A56 /* QuickReplies.swift in Sources */,
+				A5A64341F3EA1C90D03992E6 /* RelayCrypto.swift in Sources */,
+				D5883E26DD6488EEAAA18BE6 /* SwipeActions.swift in Sources */,
+				4992982944F67B9304A923C5 /* TowerActivityAttributes.swift in Sources */,
+				C780A1068EE98378EE029FEB /* TowerLiveActivity.swift in Sources */,
+				98A64022C64A39ED028ED724 /* TowerSummary.swift in Sources */,
+				20D75E123DE5B429B8169652 /* TowerTheme.swift in Sources */,
+				978A6FF9DB1E34D1DBBD51A5 /* TowermanIDs.swift in Sources */,
+				D47ACA426627A41640019D3C /* WatchSyncPolicy.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AECB062A97BBB0B65B16069F /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1C07DE4E9FECF89F483DCF61 /* AgentModels.swift in Sources */,
+				E04E2D5AF9440A9012A46E2F /* LaunchModels.swift in Sources */,
+				C33841681F5012A927AABAF4 /* QuickReplies.swift in Sources */,
+				03C23325745B129145094399 /* RelayCrypto.swift in Sources */,
+				681464361D001651B77DC536 /* SwipeActions.swift in Sources */,
+				3883F6C63A88675EEA87DC6D /* TowerIntents.swift in Sources */,
+				37B734E1957BBBD33182BDBD /* TowerSummary.swift in Sources */,
+				EF4ABA2D4B8A8EA057A506FF /* TowerTheme.swift in Sources */,
+				E235D489D775997A24324B2A /* TowerWidgets.swift in Sources */,
+				DA228F663C56238B2B63DEB2 /* TowermanIDs.swift in Sources */,
+				4E9559EA9A1B415B1C3A5629 /* WatchSyncPolicy.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B4D026F405808F86131F546B /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0014B6EDBEA8B8043F7B9BD7 /* AgentDeckApp.swift in Sources */,
+				9FB6D86F0C85DB289996A406 /* AgentDeckBridgeManager.swift in Sources */,
+				C2528BFBE931375FF2D9DB72 /* AgentModels.swift in Sources */,
+				279A5C139E13E95DB9961841 /* BackgroundAudioKeeper.swift in Sources */,
+				83AE548863713EE4FDED06A7 /* ContentView.swift in Sources */,
+				6E52ACCD9934A678E878A7CC /* DecisionNotification.swift in Sources */,
+				1373999CD89E7996090C0C11 /* LaunchModels.swift in Sources */,
+				3462F3D2622FA8EF9E4D7F5A /* NovaTarefaView.swift in Sources */,
+				5276064DA9A3503187CB6DDE /* PromptNotifier.swift in Sources */,
+				6CE466F14FC4C91647F65F4E /* QuickReplies.swift in Sources */,
+				686E1E72BBA3AF83B82632AA /* RelayCrypto.swift in Sources */,
+				F01F946A8EA0515AEB75397E /* ServerLink.swift in Sources */,
+				45867B3483AF4EFA1A844D20 /* SwipeActions.swift in Sources */,
+				BF4F9192207318DE38AB9502 /* TowerActivityAttributes.swift in Sources */,
+				A9CA7FF47931A3CFEDF2FE32 /* TowerActivityController.swift in Sources */,
+				1931703000B469FE66556F53 /* TowerSummary.swift in Sources */,
+				99939DE83ECDE4DC041268FF /* TowerTheme.swift in Sources */,
+				0AA49CBE50D697212E6156DF /* TowermanIDs.swift in Sources */,
+				89A48ABAF6F68C0DB31D7E37 /* WatchSyncPolicy.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C54B535BAD1CCAA96AD17598 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				7BBEF0ED8B81B2CED2D023B0 /* AgentDeckWatchApp.swift in Sources */,
+				FF0C0FD8C17040A06287DB70 /* AgentModels.swift in Sources */,
+				823A093D84FA53C3D6DB2290 /* LaunchModels.swift in Sources */,
+				BB27C8B7F39D67AD5E28D0A8 /* LaunchView.swift in Sources */,
+				D1C24ABD8AE50AF3C6D402B2 /* QuickReplies.swift in Sources */,
+				8B9FC1FA86705BAC7C84FE85 /* RelayCrypto.swift in Sources */,
+				ACBA966C243A625D341161EB /* SwipeActions.swift in Sources */,
+				82393438C9593CA555E74E82 /* TowerIntents.swift in Sources */,
+				8A0A67DE0BBD70902579E75A /* TowerShortcuts.swift in Sources */,
+				16E83A246F5B92C3D80536CB /* TowerSummary.swift in Sources */,
+				FD08539B1ED14B45252BB3AA /* TowerTheme.swift in Sources */,
+				A87E589517BEE013ABA68191 /* TowermanIDs.swift in Sources */,
+				F7110823830D35F2D67AE04A /* WatchContentView.swift in Sources */,
+				ED583C904388969A70CBEA67 /* WatchSyncPolicy.swift in Sources */,
+				239473E9F441742CC2F15C20 /* WatchViewModel.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		36464C0C231042E16AF05C63 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 0D4B0E68D5B8D92B9B795AEB /* TowermanNotificationService */;
+			targetProxy = C41620BEF208139BB07B6CDB /* PBXContainerItemProxy */;
+		};
+		9BF7028611C70850BCE35923 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = C9D5731B31B9323509A5FC80 /* TowermanLive */;
+			targetProxy = 6AF8878DD32C1AD1EB160D21 /* PBXContainerItemProxy */;
+		};
+		A18AE4EA5D911E744D2FD7B3 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = DF67F4007ACF00F4FFCF5602 /* TowermanWatchWidgets */;
+			targetProxy = 5811702AE27C834ADDF8EC18 /* PBXContainerItemProxy */;
+		};
+		D39D868F8A4B5CACF4D9E286 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = CF2863B1676676BE85E19549 /* TowermanWatch */;
+			targetProxy = 33F7812C52AAEB51CB53AEBE /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		0BAF94307489FA24866DB759 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				INFOPLIST_FILE = LiveActivity/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "$(TOWERMAN_IOS_BUNDLE_ID).live";
+				PRODUCT_NAME = TowermanLive;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		136B6585C81D81EB762F98CB /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				INFOPLIST_FILE = LiveActivity/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "$(TOWERMAN_IOS_BUNDLE_ID).live";
+				PRODUCT_NAME = TowermanLive;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		13E6616F20C44754C1BA541B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				COMBINE_HIDPI_IMAGES = YES;
+				ENABLE_APP_SANDBOX = NO;
+				ENABLE_HARDENED_RUNTIME = NO;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				INFOPLIST_FILE = Mac/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "$(TOWERMAN_MAC_BUNDLE_ID)";
+				PRODUCT_NAME = Towerman;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		1CA506EE5DF4073D6E4C7A7C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 6B001AC486DA3CFCFB6162D8 /* Towerman.xcconfig */;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MARKETING_VERSION = 2.0.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				WATCHOS_DEPLOYMENT_TARGET = 26.0;
+			};
+			name = Debug;
+		};
+		1D26282B1295934BB1A3AEFA /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = NotificationService/TowermanNotificationService.entitlements;
+				INFOPLIST_FILE = NotificationService/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "$(TOWERMAN_IOS_BUNDLE_ID).notifications";
+				PRODUCT_NAME = TowermanNotificationService;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		42DA7F72AC77B5DAA5CF610A /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 6B001AC486DA3CFCFB6162D8 /* Towerman.xcconfig */;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MARKETING_VERSION = 2.0.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+				WATCHOS_DEPLOYMENT_TARGET = 26.0;
+			};
+			name = Release;
+		};
+		57AA9242063E20D106668CAF /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = WatchWidgets/TowermanWatchWidgets.entitlements;
+				INFOPLIST_FILE = WatchWidgets/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "$(TOWERMAN_IOS_BUNDLE_ID).watchkitapp.widgets";
+				PRODUCT_NAME = TowermanWatchWidgets;
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = 4;
+			};
+			name = Debug;
+		};
+		5E4D70060E36BA2F4F82898C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = WatchWidgets/TowermanWatchWidgets.entitlements;
+				INFOPLIST_FILE = WatchWidgets/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "$(TOWERMAN_IOS_BUNDLE_ID).watchkitapp.widgets";
+				PRODUCT_NAME = TowermanWatchWidgets;
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = 4;
+			};
+			name = Release;
+		};
+		7A7D17A033898FDE665FD919 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = iOS/Towerman.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				INFOPLIST_FILE = iOS/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "$(TOWERMAN_IOS_BUNDLE_ID)";
+				PRODUCT_NAME = Towerman;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		94F1688108417D9DE8AAA16A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = WatchApp/TowermanWatch.entitlements;
+				INFOPLIST_FILE = WatchApp/Info.plist;
+				PRODUCT_BUNDLE_IDENTIFIER = "$(TOWERMAN_IOS_BUNDLE_ID).watchkitapp";
+				PRODUCT_NAME = TowermanWatch;
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = 4;
+			};
+			name = Debug;
+		};
+		9653595A0B1A7342D379056A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = WatchApp/TowermanWatch.entitlements;
+				INFOPLIST_FILE = WatchApp/Info.plist;
+				PRODUCT_BUNDLE_IDENTIFIER = "$(TOWERMAN_IOS_BUNDLE_ID).watchkitapp";
+				PRODUCT_NAME = TowermanWatch;
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = 4;
+			};
+			name = Release;
+		};
+		CB62E550A08C45EC8AFA44EF /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				COMBINE_HIDPI_IMAGES = YES;
+				ENABLE_APP_SANDBOX = NO;
+				ENABLE_HARDENED_RUNTIME = NO;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				INFOPLIST_FILE = Mac/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "$(TOWERMAN_MAC_BUNDLE_ID)";
+				PRODUCT_NAME = Towerman;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		CE452717CBE3036E931A2EB1 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = NotificationService/TowermanNotificationService.entitlements;
+				INFOPLIST_FILE = NotificationService/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "$(TOWERMAN_IOS_BUNDLE_ID).notifications";
+				PRODUCT_NAME = TowermanNotificationService;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		D04F4FF96B7E00167B09518D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = iOS/Towerman.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				INFOPLIST_FILE = iOS/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "$(TOWERMAN_IOS_BUNDLE_ID)";
+				PRODUCT_NAME = Towerman;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		17030B38FFD83B195A8DA850 /* Build configuration list for PBXProject "Towerman" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1CA506EE5DF4073D6E4C7A7C /* Debug */,
+				42DA7F72AC77B5DAA5CF610A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		56CEA9F943A704FC69918CB7 /* Build configuration list for PBXNativeTarget "TowermanWatch" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				94F1688108417D9DE8AAA16A /* Debug */,
+				9653595A0B1A7342D379056A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		62D133A8CCA9BD285F7B4CB4 /* Build configuration list for PBXNativeTarget "TowermanNotificationService" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1D26282B1295934BB1A3AEFA /* Debug */,
+				CE452717CBE3036E931A2EB1 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		82B923C0A4CAFBA409D7E286 /* Build configuration list for PBXNativeTarget "TowermanMac" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				13E6616F20C44754C1BA541B /* Debug */,
+				CB62E550A08C45EC8AFA44EF /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		DD4BF3242B405EF78B135180 /* Build configuration list for PBXNativeTarget "TowermanLive" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				136B6585C81D81EB762F98CB /* Debug */,
+				0BAF94307489FA24866DB759 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		F9CCE88B1B0C57F236E008BE /* Build configuration list for PBXNativeTarget "TowermanWatchWidgets" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				57AA9242063E20D106668CAF /* Debug */,
+				5E4D70060E36BA2F4F82898C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		FEDB18562B0693F35638E719 /* Build configuration list for PBXNativeTarget "Towerman" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				7A7D17A033898FDE665FD919 /* Debug */,
+				D04F4FF96B7E00167B09518D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 26C6D1719449FA30298DC067 /* Project object */;
+}
